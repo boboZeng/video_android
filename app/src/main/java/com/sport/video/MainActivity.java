@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_custom);
+        setContentView(R.layout.activity_main);
         VideoUtils.setEnableDebug(true);
         videoLayout = findViewById(R.id.videoLayout);
         videoLayout.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
