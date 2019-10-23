@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="VideoLayout">
+        <attr name="aspectRatio" format="float" />
+        <attr name="layout" format="reference" />
+        <attr name="isDefaultFullScreen" format="boolean" />
+
+    </declare-styleable>
+
+</resources>
