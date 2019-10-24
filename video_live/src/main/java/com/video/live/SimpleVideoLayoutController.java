@@ -66,6 +66,11 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
         return surface_container;
     }
 
+    @Override
+    public void setSurfaceViewVisibility(int visibility) {
+        surface_container.setVisibility(visibility);
+    }
+
     /**
      * 暂停播放按钮
      *
@@ -79,6 +84,13 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
     @Override
     public boolean isFullScreen() {
         return isFullScreen;
+    }
+
+    @Override
+    public void release() {
+        setTopVisibility(View.GONE);
+        setBottomVisibility(View.GONE);
+        setSurfaceViewVisibility(View.GONE);
     }
 
     @Override
@@ -164,7 +176,7 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
         if (VideoUtils.isNullOrEmpty(videoController.getVideoPath())) {
             return;
         }
-        layout_bottom.setVisibility(flag ? View.INVISIBLE : View.VISIBLE);
+        setBottomVisibility(flag ? View.INVISIBLE : View.VISIBLE);
         setTopVisibility(flag ? View.INVISIBLE : View.VISIBLE);
         startButton.setVisibility(flag ? View.INVISIBLE : View.VISIBLE);
         isShowCover = !flag;
@@ -177,6 +189,10 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
      */
     public void setTopVisibility(int visibility) {
         layout_top.setVisibility(visibility);
+    }
+
+    public void setBottomVisibility(int visibility) {
+        layout_bottom.setVisibility(visibility);
     }
 
     /**
@@ -221,4 +237,7 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
         return false;
     }
 
+    public View getParentLayout() {
+        return parentLayout;
+    }
 }

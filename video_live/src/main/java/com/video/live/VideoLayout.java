@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,12 +21,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkTimedText;
+import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 
 
 /**
@@ -119,6 +122,11 @@ public class VideoLayout extends FrameLayout implements VideoController {
         createSurfaceView(videoLayoutController.getSurface_container());
     }
 
+    public void setSurfaceViewVisibility(int visibility) {
+        videoLayoutController.setSurfaceViewVisibility(visibility);
+    }
+
+
     /**
      * 设置播放地址
      *
@@ -211,7 +219,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
         player.setOnSeekCompleteListener(mSeekCompleteListener);
         player.setOnTimedTextListener(mTimedTextListener);
         player.setOnCompletionListener(mCompletionListener);
-        player.setOnNativeInvokeListener( mNativeInvokeListener);
+        player.setOnNativeInvokeListener(mNativeInvokeListener);
     }
 
     @Override
@@ -243,13 +251,25 @@ public class VideoLayout extends FrameLayout implements VideoController {
             mMediaPlayer.stop();
             mMediaPlayer.release();
         }
-        mSurfaceView.getHolder().addCallback(callback);
         try {
             currentState = STATE_PREPARING;
             mMediaPlayer = createPlayer();
             setListener(mMediaPlayer);
             mMediaPlayer.setDisplay(mSurfaceView.getHolder());
-            mMediaPlayer.setDataSource(mContext, Uri.parse(mPath), mHeader);
+
+            Uri mUri = Uri.parse(mPath);
+            String scheme = mUri.getScheme();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+//                    mSettings.getUsingMediaDataSource() &&
+                    (TextUtils.isEmpty(scheme) || scheme.equalsIgnoreCase("file"))) {
+                IMediaDataSource dataSource = new FileMediaDataSource(new File(mUri.toString()));
+                mMediaPlayer.setDataSource(dataSource);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                mMediaPlayer.setDataSource(getContext(), mUri, mHeader);
+            } else {
+                mMediaPlayer.setDataSource(mUri.toString());
+            }
+//            mMediaPlayer.setDataSource(mContext, mUri, mHeader);
             mMediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
@@ -296,6 +316,9 @@ public class VideoLayout extends FrameLayout implements VideoController {
             mMediaPlayer.release();
             mMediaPlayer = null;
             mAudioFocusHelper.abandonFocus();
+        }
+        if (videoLayoutController != null) {
+            videoLayoutController.release();
         }
     }
 
@@ -543,7 +566,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
     IjkMediaPlayer.OnNativeInvokeListener mNativeInvokeListener = new IjkMediaPlayer.OnNativeInvokeListener() {
         @Override
         public boolean onNativeInvoke(int i, Bundle bundle) {
-            VideoUtils.d("VideoLayout onNativeInvoke i:"+i);
+            VideoUtils.d("VideoLayout onNativeInvoke i:" + i);
             if (onNativeInvokeListener != null) {
                 return onNativeInvokeListener.onNativeInvoke(i, bundle);
             }

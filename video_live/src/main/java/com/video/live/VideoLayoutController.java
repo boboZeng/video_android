@@ -22,6 +22,8 @@ public abstract class VideoLayoutController {
 
     public abstract FrameLayout getSurface_container();
 
+    public abstract void setSurfaceViewVisibility(int visibility);
+
     /**
      * 暂停播放按钮
      *
@@ -30,5 +32,7 @@ public abstract class VideoLayoutController {
     public abstract void setPlayImageResource(@DrawableRes int resId);
 
     public abstract boolean isFullScreen();
+
+    public abstract void release();
 
 }
