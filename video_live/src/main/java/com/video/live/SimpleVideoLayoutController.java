@@ -69,6 +69,11 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
     @Override
     public void setSurfaceViewVisibility(int visibility) {
         surface_container.setVisibility(visibility);
+        int count = surface_container.getChildCount();
+        for(int i=0;i<count;i++){
+            View view = surface_container.getChildAt(i);
+            view.setVisibility(visibility);
+        }
     }
 
     /**
