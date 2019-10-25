@@ -1,5 +1,6 @@
 package com.video.live;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -190,6 +191,12 @@ public class VideoLayout extends FrameLayout implements VideoController {
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "min-frames", 100);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 1);
+        //如果项目中同时使用了HTTP和HTTPS的视频源的话，要注意如果视频源刚好是相同域名，会导致播放失败，这是由于dns缓存造成的;
+        //设置清除dns cache;
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "dns_cache_clear", 1);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "protocol_whitelist", "async,cache,crypto,file,http,https,ijkhttphook,ijkinject,ijklivehook,ijklongurl,ijksegment,ijktcphook,pipe,rtp,tcp,tls,udp,ijkurlhook,data,concat,subfile,udp,ffconcat");
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"safe",0);
+
 
         ijkMediaPlayer.setVolume(1.0f, 1.0f);
 
@@ -259,13 +266,20 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
             Uri mUri = Uri.parse(mPath);
             String scheme = mUri.getScheme();
+
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
 //                    mSettings.getUsingMediaDataSource() &&
                     (TextUtils.isEmpty(scheme) || scheme.equalsIgnoreCase("file"))) {
                 IMediaDataSource dataSource = new FileMediaDataSource(new File(mUri.toString()));
                 mMediaPlayer.setDataSource(dataSource);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                mMediaPlayer.setDataSource(getContext(), mUri, mHeader);
+                if (scheme.equals(ContentResolver.SCHEME_ANDROID_RESOURCE)) {
+                    RawDataSourceProvider rawDataSourceProvider = RawDataSourceProvider.create(getContext(), mUri);
+                    mMediaPlayer.setDataSource(rawDataSourceProvider);
+                } else {
+                    mMediaPlayer.setDataSource(getContext(), mUri, mHeader);
+                }
             } else {
                 mMediaPlayer.setDataSource(mUri.toString());
             }
