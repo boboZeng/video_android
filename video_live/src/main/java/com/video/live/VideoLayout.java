@@ -67,7 +67,6 @@ public class VideoLayout extends FrameLayout implements VideoController {
     private AudioFocusHelper mAudioFocusHelper;
     private int layout;
     private float aspectRatio = 9 / 16f;
-    private boolean isDefaultFullScreen = false;
     private VideoLayoutController videoLayoutController;
     private int currentState = STATE_IDLE;
 
@@ -101,7 +100,6 @@ public class VideoLayout extends FrameLayout implements VideoController {
                 defStyleAttr, defStyleRes);
         layout = typedArray.getResourceId(R.styleable.VideoLayout_layout, R.layout.video_layout);
         aspectRatio = typedArray.getFloat(R.styleable.VideoLayout_aspectRatio, 9 / 16f);
-        isDefaultFullScreen = typedArray.getBoolean(R.styleable.VideoLayout_isDefaultFullScreen, false);
 
 
         mAudioManager = (AudioManager) mContext.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
@@ -119,7 +117,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
             videoLayoutController = new SimpleVideoLayoutController(getContext(), null);
         }
         View view = LayoutInflater.from(getContext()).inflate(layout, null);
-        videoLayoutController.initView(view, this, isDefaultFullScreen);
+        videoLayoutController.initView(view, this);
         createSurfaceView(videoLayoutController.getSurface_container());
     }
 

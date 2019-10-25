@@ -18,7 +18,7 @@ public abstract class VideoLayoutController {
         this.context = context;
     }
 
-    public abstract void initView(View view, VideoController videoController, boolean isFullScreen);
+    public abstract void initView(View view, VideoController videoController);
 
     public abstract FrameLayout getSurface_container();
 
