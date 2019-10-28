@@ -72,11 +72,17 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
 
     @Override
     public void setSurfaceViewVisibility(int visibility) {
-        surface_container.setVisibility(visibility);
         int count = surface_container.getChildCount();
         for (int i = 0; i < count; i++) {
             View view = surface_container.getChildAt(i);
             view.setVisibility(visibility);
+        }
+    }
+
+    @Override
+    public void setLoadingVisibility(int visibility) {
+        if(progressBar!=null){
+            progressBar.setVisibility(visibility);
         }
     }
 
@@ -120,7 +126,6 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
                 videoController.pause();
             } else {
                 try {
-                    progressBar.setVisibility(View.VISIBLE);
                     videoController.load();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -211,10 +216,6 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
      */
     public void setThumbVisibility(int visibility) {
         imgThumb.setVisibility(visibility);
-    }
-
-    public void setProgressBarVisibility(int visibility) {
-        progressBar.setVisibility(visibility);
     }
 
     /**
