@@ -22,7 +22,18 @@ public abstract class VideoLayoutController {
 
     public abstract FrameLayout getSurface_container();
 
+    /**
+     * 显示视频画面的SurfaceView
+     * @param visibility
+     */
     public abstract void setSurfaceViewVisibility(int visibility);
+
+    /**
+     * 加载动画显示
+     * @param visibility
+     */
+    public abstract void setLoadingVisibility(int visibility);
+
 
     /**
      * 暂停播放按钮

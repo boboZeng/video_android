@@ -264,7 +264,8 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
             Uri mUri = Uri.parse(mPath);
             String scheme = mUri.getScheme();
-
+            videoLayoutController.setSurfaceViewVisibility(View.VISIBLE);
+            videoLayoutController.setLoadingVisibility(View.VISIBLE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
 //                    mSettings.getUsingMediaDataSource() &&
@@ -481,8 +482,10 @@ public class VideoLayout extends FrameLayout implements VideoController {
         @Override
         public void onPrepared(IMediaPlayer iMediaPlayer) {
             VideoUtils.d("VideoLayout onPrepared:");
-            currentState = STATE_PREPARED;
-            start();
+            if (currentState == STATE_PREPARING) {
+                currentState = STATE_PREPARED;
+                start();
+            }
             if (onPreparedListener != null) {
                 onPreparedListener.onPrepared(iMediaPlayer);
             }
