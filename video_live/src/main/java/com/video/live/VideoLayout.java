@@ -67,7 +67,6 @@ public class VideoLayout extends FrameLayout implements VideoController {
     private AudioFocusHelper mAudioFocusHelper;
     private int layout;
     private float aspectRatio = 9 / 16f;
-    private boolean isDefaultFullScreen = false;
     private VideoLayoutController videoLayoutController;
     private int currentState = STATE_IDLE;
 
@@ -101,7 +100,6 @@ public class VideoLayout extends FrameLayout implements VideoController {
                 defStyleAttr, defStyleRes);
         layout = typedArray.getResourceId(R.styleable.VideoLayout_layout, R.layout.video_layout);
         aspectRatio = typedArray.getFloat(R.styleable.VideoLayout_aspectRatio, 9 / 16f);
-        isDefaultFullScreen = typedArray.getBoolean(R.styleable.VideoLayout_isDefaultFullScreen, false);
 
 
         mAudioManager = (AudioManager) mContext.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
@@ -119,7 +117,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
             videoLayoutController = new SimpleVideoLayoutController(getContext(), null);
         }
         View view = LayoutInflater.from(getContext()).inflate(layout, null);
-        videoLayoutController.initView(view, this, isDefaultFullScreen);
+        videoLayoutController.initView(view, this);
         createSurfaceView(videoLayoutController.getSurface_container());
     }
 
@@ -180,13 +178,11 @@ public class VideoLayout extends FrameLayout implements VideoController {
     //创建一个新的player
     private IjkMediaPlayer createPlayer() {
         IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
-        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 1);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 0);
 
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 1);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
-
-        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "http-detect-range-support", 1);
 
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "min-frames", 100);
@@ -194,9 +190,10 @@ public class VideoLayout extends FrameLayout implements VideoController {
         //如果项目中同时使用了HTTP和HTTPS的视频源的话，要注意如果视频源刚好是相同域名，会导致播放失败，这是由于dns缓存造成的;
         //设置清除dns cache;
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "dns_cache_clear", 1);
-//        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "protocol_whitelist", "async,cache,crypto,file,http,https,ijkhttphook,ijkinject,ijklivehook,ijklongurl,ijksegment,ijktcphook,pipe,rtp,tcp,tls,udp,ijkurlhook,data,concat,subfile,udp,ffconcat");
-//        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"safe",0);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "http-detect-range-support", 1);
 
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "timeout", 10000000);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 5);
 
         ijkMediaPlayer.setVolume(1.0f, 1.0f);
 
@@ -266,7 +263,8 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
             Uri mUri = Uri.parse(mPath);
             String scheme = mUri.getScheme();
-
+            videoLayoutController.setSurfaceViewVisibility(View.VISIBLE);
+            videoLayoutController.setLoadingVisibility(View.VISIBLE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
 //                    mSettings.getUsingMediaDataSource() &&
@@ -483,8 +481,10 @@ public class VideoLayout extends FrameLayout implements VideoController {
         @Override
         public void onPrepared(IMediaPlayer iMediaPlayer) {
             VideoUtils.d("VideoLayout onPrepared:");
-            currentState = STATE_PREPARED;
-            start();
+            if (currentState == STATE_PREPARING) {
+                currentState = STATE_PREPARED;
+                start();
+            }
             if (onPreparedListener != null) {
                 onPreparedListener.onPrepared(iMediaPlayer);
             }

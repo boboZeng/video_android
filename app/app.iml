@@ -138,7 +138,5 @@
     <orderEntry type="library" name="Gradle: :ijkplayer-java-release:@aar" level="project" />
     <orderEntry type="module" module-name="video_live" />
     <orderEntry type="module" module-name="video_live" />
-    <orderEntry type="module" module-name="video_live" />
-    <orderEntry type="module" module-name="video_live" />
   </component>
 </module>
