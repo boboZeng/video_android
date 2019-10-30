@@ -634,5 +634,9 @@ public class VideoLayout extends FrameLayout implements VideoController {
     public void setOnNativeInvokeListener(IjkMediaPlayer.OnNativeInvokeListener onNativeInvokeListener) {
         this.onNativeInvokeListener = onNativeInvokeListener;
     }
+
+    public void setAspectRatio(float ratio) {
+        this.aspectRatio = ratio;
+    }
     //</editor-fold>
 }
