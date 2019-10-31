@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrepared(IMediaPlayer iMediaPlayer) {
                 controller.setThumbVisibility(View.GONE);
-                controller.setProgressBarVisibility(View.GONE);
+                controller.setLoadingVisibility(View.GONE);
             }
         });
 
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        controller.gotoScreenFullscreen();
     }
 
     @Override

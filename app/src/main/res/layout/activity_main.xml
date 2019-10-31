@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:aspectRatio="0.56"
-        app:isDefaultFullScreen="true"
         app:layout="@layout/video_layout" />
 
     <TextView
