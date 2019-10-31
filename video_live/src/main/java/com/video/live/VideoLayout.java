@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -242,9 +243,9 @@ public class VideoLayout extends FrameLayout implements VideoController {
         }
         int specWidth = 0;
         if (floatingMode) {
-            specWidth = (int) (MeasureSpec.getSize(widthMeasureSpec) * 0.4);
+            specWidth = (int) (VideoUtils.getscreenWidth(getContext()) * 0.4);
         } else
-            specWidth = MeasureSpec.getSize(widthMeasureSpec);
+            specWidth = VideoUtils.getscreenWidth(getContext());
         int specHeight = (int) (specWidth * aspectRatio);
         VideoUtils.d("VideoLayout onMeasure specWidth:" + specWidth
                 + ",specHeight:" + specHeight);
