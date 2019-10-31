@@ -288,7 +288,10 @@ public class VideoLayout extends FrameLayout implements VideoController {
                     + layoutParams.leftMargin);
             int calculateTop = layoutParams.topMargin += y;
             int calculateLeft = layoutParams.leftMargin += x;
-            if (calculateTop < (-this.getHeight() * 0.6) || calculateLeft < (-this.getWidth() * 0.6)) {
+            if (calculateTop > (VideoUtils.getscreenhHeight(getContext()) - VideoUtils.getStatusBarHeight(getContext()) - VideoUtils.getNavigetionHeight(getContext()) - this.getHeight() * 0.8)//下
+                    || calculateTop < (-this.getHeight() * 0.6) //上
+                    || calculateLeft < (-this.getWidth() * 0.6)//左
+                    || calculateLeft > (VideoUtils.getscreenWidth(getContext()) - this.getHeight() * 0.8)) {//右
                 stop();
                 this.setVisibility(View.GONE);
             } else {
@@ -302,7 +305,11 @@ public class VideoLayout extends FrameLayout implements VideoController {
                     + layoutParams.leftMargin);
             int calculateTop = layoutParams.topMargin += y;
             int calculateLeft = layoutParams.leftMargin += x;
-            if (calculateTop < (-this.getHeight() * 0.6) || calculateLeft < (-this.getWidth() * 0.6)) {
+
+            if (calculateTop > (VideoUtils.getscreenhHeight(getContext()) - VideoUtils.getStatusBarHeight(getContext()) - VideoUtils.getNavigetionHeight(getContext()) - this.getHeight() * 0.8)//下
+                    || calculateTop < (-this.getHeight() * 0.6) //上
+                    || calculateLeft < (-this.getWidth() * 0.6)//左
+                    || calculateLeft > (VideoUtils.getscreenWidth(getContext()) - this.getHeight() * 0.8)) {//右
                 stop();
                 this.setVisibility(View.GONE);
             } else {
@@ -707,6 +714,16 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
     public void setFloatingMode(boolean open) {
         this.floatingMode = open;
+
+        if (getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) getLayoutParams();
+            params.leftMargin = (int) (VideoUtils.getscreenWidth(getContext()) * 0.55);
+            params.topMargin = (int) (VideoUtils.getscreenhHeight(getContext()) * 0.75);
+            setLayoutParams(params);
+        } else if (getLayoutParams() instanceof LinearLayout.LayoutParams) {
+            //暫時不做
+        }
+
     }
 
     public void setMarginTop(int top) {

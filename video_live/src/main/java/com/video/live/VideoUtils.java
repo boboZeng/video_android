@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
@@ -27,6 +28,7 @@ public class VideoUtils {
 
     /**
      * 是否可以调试
+     *
      * @param enableDebug
      */
     public static void setEnableDebug(boolean enableDebug) {
@@ -38,7 +40,7 @@ public class VideoUtils {
     }
 
     public static void d(String str) {
-        if(enableDebug){
+        if (enableDebug) {
             Log.d("VideoUtils", str);
         }
     }
@@ -181,6 +183,7 @@ public class VideoUtils {
 
     /**
      * 屏幕宽
+     *
      * @param context
      * @return
      */
@@ -193,5 +196,40 @@ public class VideoUtils {
         //获取的像素宽高不包含虚拟键所占空间
         wm.getDefaultDisplay().getMetrics(metric);
         return metric.widthPixels;  // 宽度（像素）
+    }
+
+    /**
+     * 屏幕高
+     *
+     * @param context
+     * @return
+     */
+    public static int getscreenhHeight(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(
+                Context.WINDOW_SERVICE);
+        DisplayMetrics metric = new DisplayMetrics();
+        //API 17之后使用，获取的像素宽高包含虚拟键所占空间，在API 17之前通过反射获取
+        //        context.getWindowManager().getDefaultDisplay().getRealMetrics(metric);
+        //获取的像素宽高不包含虚拟键所占空间
+        wm.getDefaultDisplay().getMetrics(metric);
+        return metric.heightPixels;  // 宽度（像素）
+    }
+
+    public static int getNavigetionHeight(Context context) {
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+        return 0;
+    }
+
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 }
