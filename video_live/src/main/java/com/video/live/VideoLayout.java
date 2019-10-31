@@ -280,18 +280,35 @@ public class VideoLayout extends FrameLayout implements VideoController {
             return;
         }
         System.out.println("ribory updateLocation x:" + x + ",y:" + y);
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.getLayoutParams();
+        if (this.getLayoutParams() instanceof LinearLayout.LayoutParams) {
 
-        System.out.println("ribory updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
-                + layoutParams.leftMargin);
-        int calculateTop = layoutParams.topMargin += y;
-        int calculateLeft = layoutParams.leftMargin += x;
-        if (calculateTop < (-this.getHeight() * 0.6) || calculateLeft < (-this.getWidth() * 0.6)) {
-            stop();
-            this.setVisibility(View.GONE);
-        } else {
-            layoutParams.topMargin = calculateTop;
-            layoutParams.leftMargin = calculateLeft;
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.getLayoutParams();
+
+            System.out.println("ribory updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
+                    + layoutParams.leftMargin);
+            int calculateTop = layoutParams.topMargin += y;
+            int calculateLeft = layoutParams.leftMargin += x;
+            if (calculateTop < (-this.getHeight() * 0.6) || calculateLeft < (-this.getWidth() * 0.6)) {
+                stop();
+                this.setVisibility(View.GONE);
+            } else {
+                layoutParams.topMargin = calculateTop;
+                layoutParams.leftMargin = calculateLeft;
+            }
+        } else if (this.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) this.getLayoutParams();
+            System.out.println("ribory updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
+                    + layoutParams.leftMargin);
+            int calculateTop = layoutParams.topMargin += y;
+            int calculateLeft = layoutParams.leftMargin += x;
+            if (calculateTop < (-this.getHeight() * 0.6) || calculateLeft < (-this.getWidth() * 0.6)) {
+                stop();
+                this.setVisibility(View.GONE);
+            } else {
+                layoutParams.topMargin = calculateTop;
+                layoutParams.leftMargin = calculateLeft;
+            }
         }
 
         this.requestLayout();
@@ -694,9 +711,15 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
     public void setMarginTop(int top) {
         this.marginTop = top;
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) getLayoutParams();
-        params.setMargins(params.leftMargin, top, params.rightMargin, params.bottomMargin);
-        setLayoutParams(params);
+        if (getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) getLayoutParams();
+            params.setMargins(params.leftMargin, top, params.rightMargin, params.bottomMargin);
+            setLayoutParams(params);
+        } else if (getLayoutParams() instanceof LinearLayout.LayoutParams) {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) getLayoutParams();
+            params.setMargins(params.leftMargin, top, params.rightMargin, params.bottomMargin);
+            setLayoutParams(params);
+        }
     }
     //</editor-fold>
 }
