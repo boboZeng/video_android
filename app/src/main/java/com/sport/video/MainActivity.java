@@ -11,7 +11,6 @@ import com.video.live.VideoLayout;
 import com.video.live.VideoUtils;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 public class MainActivity extends AppCompatActivity {
     private VideoLayout videoLayout;
@@ -29,9 +28,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         VideoUtils.setEnableDebug(true);
-        // init player
-        IjkMediaPlayer.loadLibrariesOnce(null);
-        IjkMediaPlayer.native_profileBegin("libijkplayer.so");
 
         videoLayout = findViewById(R.id.videoLayout);
         videoLayout.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
