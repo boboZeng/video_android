@@ -242,7 +242,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
         }
         int specWidth = 0;
         if (floatingMode) {
-            specWidth = (int) (MeasureSpec.getSize(widthMeasureSpec)*0.4);
+            specWidth = (int) (MeasureSpec.getSize(widthMeasureSpec) * 0.4);
         } else
             specWidth = MeasureSpec.getSize(widthMeasureSpec);
         int specHeight = (int) (specWidth * aspectRatio);
@@ -260,8 +260,8 @@ public class VideoLayout extends FrameLayout implements VideoController {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         System.out.println("ribory dispatchTouchEvent getAction:" + ev.getAction());
-        float x = ev.getX();
-        float y = ev.getY();
+        float x = ev.getRawX();
+        float y = ev.getRawY();
         if (ev.getAction() == MotionEvent.ACTION_MOVE) {
             float moveX = x - nextX;
             float moveY = y - nextY;
@@ -284,13 +284,15 @@ public class VideoLayout extends FrameLayout implements VideoController {
         System.out.println("ribory updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
                 + layoutParams.leftMargin);
         int calculateTop = layoutParams.topMargin += y;
-        if (marginTop != 0 && calculateTop <= marginTop) {
-            layoutParams.topMargin = marginTop;
-        } else if (calculateTop < 0) {
-            layoutParams.topMargin = 0;
-        } else
+        int calculateLeft = layoutParams.leftMargin += x;
+        if (calculateTop < (-this.getHeight() * 0.6) || calculateLeft < (-this.getWidth() * 0.6)) {
+            stop();
+            this.setVisibility(View.GONE);
+        } else {
             layoutParams.topMargin = calculateTop;
-//        layoutParams.leftMargin += x;
+            layoutParams.leftMargin = calculateLeft;
+        }
+
         this.requestLayout();
     }
 //<editor-fold desc="VideoController">
