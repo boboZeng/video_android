@@ -7,6 +7,7 @@ import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -178,4 +179,19 @@ public class VideoUtils {
         VideoUtils.getWindow(context).getDecorView().setSystemUiVisibility(SYSTEM_UI);
     }
 
+    /**
+     * 屏幕宽
+     * @param context
+     * @return
+     */
+    public static int getscreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(
+                Context.WINDOW_SERVICE);
+        DisplayMetrics metric = new DisplayMetrics();
+        //API 17之后使用，获取的像素宽高包含虚拟键所占空间，在API 17之前通过反射获取
+        //        context.getWindowManager().getDefaultDisplay().getRealMetrics(metric);
+        //获取的像素宽高不包含虚拟键所占空间
+        wm.getDefaultDisplay().getMetrics(metric);
+        return metric.widthPixels;  // 宽度（像素）
+    }
 }
