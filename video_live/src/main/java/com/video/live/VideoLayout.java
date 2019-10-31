@@ -13,10 +13,13 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -70,6 +73,8 @@ public class VideoLayout extends FrameLayout implements VideoController {
     private boolean isDefaultFullScreen = false;
     private VideoLayoutController videoLayoutController;
     private int currentState = STATE_IDLE;
+    private boolean floatingMode = false;
+    private int marginTop = 0;
 
     public VideoLayout(@NonNull Context context) {
         this(context, null);
@@ -235,7 +240,11 @@ public class VideoLayout extends FrameLayout implements VideoController {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
-        int specWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int specWidth = 0;
+        if (floatingMode) {
+            specWidth = (int) (MeasureSpec.getSize(widthMeasureSpec)*0.4);
+        } else
+            specWidth = MeasureSpec.getSize(widthMeasureSpec);
         int specHeight = (int) (specWidth * aspectRatio);
         VideoUtils.d("VideoLayout onMeasure specWidth:" + specWidth
                 + ",specHeight:" + specHeight);
@@ -246,8 +255,45 @@ public class VideoLayout extends FrameLayout implements VideoController {
         getChildAt(0).measure(childWidthMeasureSpec, childHeightMeasureSpec);
     }
 
+    float nextX, nextY;
 
-    //<editor-fold desc="VideoController">
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        System.out.println("ribory dispatchTouchEvent getAction:" + ev.getAction());
+        float x = ev.getX();
+        float y = ev.getY();
+        if (ev.getAction() == MotionEvent.ACTION_MOVE) {
+            float moveX = x - nextX;
+            float moveY = y - nextY;
+            updateLocation(moveX, moveY);
+        }
+        nextX = x;
+        nextY = y;
+
+        return super.dispatchTouchEvent(ev);
+    }
+
+    private void updateLocation(float x, float y) {
+        System.out.println("ribory updateLocation videoLayout:" + this);
+        if (this == null || !floatingMode) {
+            return;
+        }
+        System.out.println("ribory updateLocation x:" + x + ",y:" + y);
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.getLayoutParams();
+
+        System.out.println("ribory updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
+                + layoutParams.leftMargin);
+        int calculateTop = layoutParams.topMargin += y;
+        if (marginTop != 0 && calculateTop <= marginTop) {
+            layoutParams.topMargin = marginTop;
+        } else if (calculateTop < 0) {
+            layoutParams.topMargin = 0;
+        } else
+            layoutParams.topMargin = calculateTop;
+//        layoutParams.leftMargin += x;
+        this.requestLayout();
+    }
+//<editor-fold desc="VideoController">
 
     @Override
     public void load() {
@@ -637,6 +683,17 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
     public void setAspectRatio(float ratio) {
         this.aspectRatio = ratio;
+    }
+
+    public void setFloatingMode(boolean open) {
+        this.floatingMode = open;
+    }
+
+    public void setMarginTop(int top) {
+        this.marginTop = top;
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) getLayoutParams();
+        params.setMargins(params.leftMargin, top, params.rightMargin, params.bottomMargin);
+        setLayoutParams(params);
     }
     //</editor-fold>
 }
