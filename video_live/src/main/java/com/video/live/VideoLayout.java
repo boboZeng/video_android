@@ -717,7 +717,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
         if (getLayoutParams() instanceof RelativeLayout.LayoutParams) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) getLayoutParams();
-            params.leftMargin = (int) (VideoUtils.getscreenWidth(getContext()) * 0.55);
+//            params.leftMargin = (int) (VideoUtils.getscreenWidth(getContext()) * 0.55);
             params.topMargin = (int) (VideoUtils.getscreenhHeight(getContext()) * 0.75);
             setLayoutParams(params);
         } else if (getLayoutParams() instanceof LinearLayout.LayoutParams) {
