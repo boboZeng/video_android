@@ -36,7 +36,7 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
     }
 
     @Override
-    public void initView(View view, VideoController videoController, boolean isFullScreen) {
+    public void initView(View view, VideoController videoController) {
         this.parentLayout = view;
         this.videoController = videoController;
         tv_status = parentLayout.findViewById(R.id.tv_status);
@@ -54,11 +54,15 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
         fullscreenButton.setOnClickListener(this);
         surface_container.setOnClickListener(this);
 
-        if (isFullScreen) {
-            gotoScreenFullscreen();
-        } else {
-            clearFloatScreen();
+        //首次不调用该方法，会引起状态栏异常
+//            clearFloatScreen();
+        if (parentLayout.getParent() != null) {
+            ViewGroup vg = (ViewGroup) (VideoUtils.scanForActivity(context)).getWindow().getDecorView();
+            vg.removeView(parentLayout);
         }
+
+        videoController.getVideoLayout().addView(parentLayout, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
     @Override
@@ -68,11 +72,17 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
 
     @Override
     public void setSurfaceViewVisibility(int visibility) {
-        surface_container.setVisibility(visibility);
         int count = surface_container.getChildCount();
-        for(int i=0;i<count;i++){
+        for (int i = 0; i < count; i++) {
             View view = surface_container.getChildAt(i);
             view.setVisibility(visibility);
+        }
+    }
+
+    @Override
+    public void setLoadingVisibility(int visibility) {
+        if(progressBar!=null){
+            progressBar.setVisibility(visibility);
         }
     }
 
@@ -116,7 +126,6 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
                 videoController.pause();
             } else {
                 try {
-                    progressBar.setVisibility(View.VISIBLE);
                     videoController.load();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -209,9 +218,6 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
         imgThumb.setVisibility(visibility);
     }
 
-    public void setProgressBarVisibility(int visibility) {
-        progressBar.setVisibility(visibility);
-    }
     /**
      * 提示文字显示
      *
@@ -228,6 +234,7 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
 
     /**
      * 覆盖背景图
+     *
      * @return
      */
     public ImageView getImgThumb() {
