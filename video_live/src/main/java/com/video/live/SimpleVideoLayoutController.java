@@ -24,6 +24,7 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
     protected ImageView startButton, imgThumb;
     protected ImageView fullscreenButton;
     protected TextView tv_status;
+    protected TextView tv_message;
     protected View parentLayout, layout_top, layout_bottom, statusBar;
     protected FrameLayout surface_container;
     protected ProgressBar progressBar;
@@ -40,6 +41,7 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
         this.parentLayout = view;
         this.videoController = videoController;
         tv_status = parentLayout.findViewById(R.id.tv_status);
+        tv_message = parentLayout.findViewById(R.id.textView_message);
         startButton = parentLayout.findViewById(R.id.start);
         imgThumb = parentLayout.findViewById(R.id.thumb);
         fullscreenButton = parentLayout.findViewById(R.id.fullscreen);
@@ -81,9 +83,20 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
 
     @Override
     public void setLoadingVisibility(int visibility) {
-        if(progressBar!=null){
+        if (progressBar != null) {
             progressBar.setVisibility(visibility);
         }
+    }
+
+    @Override
+    public void setMessage(String message) {
+        if (tv_message != null)
+            tv_message.setText(message);
+    }
+
+    @Override
+    public void clearMessage() {
+        setMessage("");
     }
 
     /**
@@ -106,12 +119,15 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
         setTopVisibility(View.GONE);
         setBottomVisibility(View.GONE);
         setSurfaceViewVisibility(View.GONE);
+        setLoadingVisibility(View.GONE);
+        clearMessage();
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.start) {
+            setMessage("");
             if (videoController == null) {
                 return;
             }

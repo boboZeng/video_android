@@ -321,6 +321,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
     @Override
     public void load() {
+        videoLayoutController.clearMessage();
         if (VideoUtils.isNullOrEmpty(mPath)) {
             return;
         }
@@ -587,6 +588,10 @@ public class VideoLayout extends FrameLayout implements VideoController {
         public boolean onError(IMediaPlayer mp, int what, int extra) {
             currentState = STATE_IDLE;
             VideoUtils.d("VideoLayout onError what:" + what + ",extra:" + extra);
+
+            videoLayoutController.setMessage(IjkPlayerStatus.getErrorMessageByErrorCode(what));
+            videoLayoutController.setLoadingVisibility(View.GONE);
+
             if (onErrorListener != null) {
                 return onErrorListener.onError(mp, what, extra);
             }

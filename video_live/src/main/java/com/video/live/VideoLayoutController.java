@@ -34,6 +34,9 @@ public abstract class VideoLayoutController {
      */
     public abstract void setLoadingVisibility(int visibility);
 
+    public abstract void setMessage(String message);
+
+    public abstract void clearMessage();
 
     /**
      * 暂停播放按钮
@@ -45,5 +48,4 @@ public abstract class VideoLayoutController {
     public abstract boolean isFullScreen();
 
     public abstract void release();
-
 }
