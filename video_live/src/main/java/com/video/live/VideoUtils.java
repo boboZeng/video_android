@@ -232,4 +232,23 @@ public class VideoUtils {
         }
         return result;
     }
+
+    /**
+     * Keep Screen on
+     */
+    public static void keepScreenOn(Activity activity) {
+        if (activity != null)
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    /**
+     * Cancel keep Screen on
+     *
+     * @param activity
+     */
+    public static void cancelScreenOn(Activity activity) {
+        if (activity != null)
+            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
 }

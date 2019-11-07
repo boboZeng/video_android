@@ -1,5 +1,6 @@
 package com.video.live;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -357,6 +358,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
             }
 //            mMediaPlayer.setDataSource(mContext, mUri, mHeader);
             mMediaPlayer.prepareAsync();
+            VideoUtils.keepScreenOn((Activity) getContext());
         } catch (IOException e) {
             e.printStackTrace();
             currentState = STATE_IDLE;
@@ -391,6 +393,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
             videoLayoutController.setPlayImageResource(R.drawable.video_sel_play);
             mMediaPlayer.stop();
             mAudioFocusHelper.abandonFocus();
+            VideoUtils.cancelScreenOn((Activity) getContext());
         }
     }
 
@@ -402,6 +405,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
             mMediaPlayer.release();
             mMediaPlayer = null;
             mAudioFocusHelper.abandonFocus();
+            VideoUtils.cancelScreenOn((Activity) getContext());
         }
         if (videoLayoutController != null) {
             videoLayoutController.release();
