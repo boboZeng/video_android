@@ -29,9 +29,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         VideoUtils.setEnableDebug(true);
+
         videoLayout.release();
         videoLayout = findViewById(R.id.videoLayout);
-        videoLayout.setAspectRatio(0.75f);
         videoLayout.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(IMediaPlayer iMediaPlayer) {
