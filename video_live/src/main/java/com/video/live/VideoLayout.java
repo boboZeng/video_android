@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -72,7 +71,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
     private AudioFocusHelper mAudioFocusHelper;
     private int layout;
     private float aspectRatio = 9 / 16f;
-    private VideoLayoutController videoLayoutController;
+    public VideoLayoutController videoLayoutController;
     private int currentState = STATE_IDLE;
     private boolean floatingMode = false;
     private int marginTop = 0;
@@ -143,9 +142,6 @@ public class VideoLayout extends FrameLayout implements VideoController {
     }
 
     public void setPath(String path, Map<String, String> header) {
-        if (VideoUtils.isNullOrEmpty(path)) {
-            return;
-        }
         mPath = path;
         mHeader = header;
     }
