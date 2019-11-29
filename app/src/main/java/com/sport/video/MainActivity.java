@@ -1,5 +1,6 @@
 package com.sport.video;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,12 +17,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 public class MainActivity extends AppCompatActivity {
     private VideoLayout videoLayout;
     private SimpleVideoLayoutController controller;
-    //    private String path ="rtmp://lssplay.bd666.cn/zbprod/2156_push_5d9dce3b4a83a?k=8fcc652ae16a21c6beef22b6c747b698&t=1571671666" ;
-//    private String path = "rtmp://lssplay.bd666.cn/hdzb001/215_5d762821e5829?k=63154822b690063a5469bf196c43ab89&t=1571215911";
-//    private String path = "rtmp://lssplay.bd666.cn/zbprod/2156_pull_5dafba8497b83?k=479692bb5a1397b50ad9b1dbf3ba490f&t=1571799301";
-//    private String path ="rtmp://lssplay.bd666.cn/zbprod/2156_push_5d9dce3b4a83a?k=49c660e930b1e66b6f711a5f1354537a&t=1571807896";
-    private String path ="http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/gear2/prog_index.m3u8";
-//    private String path ="rtmp://lssplay.undemonstrable.cn/zbprod/2728_pull_5dc3669738006?k=f731d665863d6dd1e3604dc24c8a7b05&t=1573086901";
+        private String path ="rtmp://wslive.undemonstrable.cn/wslive1/5759_push_5ddda0f46684e?wsTime=1575009617&wsSecret=d4323e657297dd55680d808bb29c0775" ;
 
 
     @Override
@@ -62,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 videoLayout.load();
+            }
+        });
+        findViewById(R.id.tv_airplay).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               startActivity(new Intent(MainActivity.this,com.androidupnpdemo.ui.MainActivity.class));
             }
         });
 

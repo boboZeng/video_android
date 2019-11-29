@@ -32,4 +32,13 @@
         android:text="start"
         android:textSize="16dp"
         android:textColor="@color/colorPrimary"/>
+
+    <TextView
+        android:id="@+id/tv_airplay"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:padding="10dp"
+        android:text="airplay"
+        android:textSize="16dp"
+        android:textColor="@color/colorPrimary"/>
 </LinearLayout>
