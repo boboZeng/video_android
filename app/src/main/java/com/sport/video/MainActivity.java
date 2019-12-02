@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,7 +18,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 public class MainActivity extends AppCompatActivity {
     private VideoLayout videoLayout;
     private SimpleVideoLayoutController controller;
-        private String path ="rtmp://wslive.undemonstrable.cn/wslive1/5759_push_5ddda0f46684e?wsTime=1575009617&wsSecret=d4323e657297dd55680d808bb29c0775" ;
+    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/5759_push_5ddda0f46684e?wsTime=1575009617&wsSecret=d4323e657297dd55680d808bb29c0775";
 
 
     @Override
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         VideoUtils.setEnableDebug(true);
-        
+
         videoLayout = findViewById(R.id.videoLayout);
         videoLayout.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
             @Override
@@ -63,11 +64,16 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv_airplay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               startActivity(new Intent(MainActivity.this,com.androidupnpdemo.ui.MainActivity.class));
+                startActivity(new Intent(MainActivity.this, com.androidupnpdemo.ui.MainActivity.class));
             }
         });
 
 //        controller.gotoScreenFullscreen();
+
+        if (NetworkUtils.isNetworkConnected(this)
+                && NetworkUtils.isMobileConnected(this)) {
+            Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
