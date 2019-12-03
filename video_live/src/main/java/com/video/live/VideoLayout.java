@@ -42,13 +42,15 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
  * Created by ribory on 2019-10-21.
  **/
 public class VideoLayout extends FrameLayout implements VideoController {
-    private static final int STATE_IDLE = 0;//闲置
-    private static final int STATE_PREPARING = 1;//正在预加载
-    private static final int STATE_PREPARED = 2;//预加载完成
-    private static final int STATE_PLAYING = 3;//正在播放
-    private static final int STATE_PAUSED = 4;//暂停
-    private static final int STATE_STOP = 5;//停止
-    private static final int STATE_PLAYBACK_COMPLETED = 6;//播放完成
+    public static final int STATE_IDLE = 0;//闲置
+    public static final int STATE_PREPARING = 1;//正在预加载
+    public static final int STATE_PREPARED = 2;//预加载完成
+    public static final int STATE_PLAYING = 3;//正在播放
+    public static final int STATE_PAUSED = 4;//暂停
+    public static final int STATE_STOP = 5;//停止
+    public static final int STATE_PLAYBACK_COMPLETED = 6;//播放完成
+    public static final int STATE_ERROR = 7;//播放出错
+    public static final int STATE_AUTO_PAUSED = 8;//自动暂停，（如按home建），回来要继续播放
 
     /**
      * 由ijkplayer提供，用于播放视频，需要给他传入一个surfaceView
@@ -374,8 +376,13 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
     @Override
     public void pause() {
+        pause(false);
+    }
+
+    @Override
+    public void pause(boolean isAutoPause) {
         if (mMediaPlayer != null) {
-            currentState = STATE_PAUSED;
+            currentState = isAutoPause ? STATE_AUTO_PAUSED : STATE_PAUSED;
             videoLayoutController.setPlayImageResource(R.drawable.video_sel_play);
             mMediaPlayer.pause();
             mAudioFocusHelper.abandonFocus();
@@ -453,7 +460,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
     @Override
     public boolean isPausing() {
-        return currentState == STATE_PAUSED;
+        return currentState == STATE_PAUSED || currentState == STATE_AUTO_PAUSED;
     }
 
     @Override
@@ -586,7 +593,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
         @Override
         public boolean onError(IMediaPlayer mp, int what, int extra) {
-            currentState = STATE_IDLE;
+            currentState = STATE_ERROR;
             VideoUtils.d("VideoLayout onError what:" + what + ",extra:" + extra);
 
             videoLayoutController.setMessage(IjkPlayerStatus.getErrorMessageByErrorCode(what));
@@ -605,6 +612,11 @@ public class VideoLayout extends FrameLayout implements VideoController {
         @Override
         public boolean onInfo(IMediaPlayer mp, int what, int extra) {
             VideoUtils.d("VideoLayout onInfo what:" + what + ",extra:" + extra);
+            if (what == IjkPlayerStatus.MEDIA_ERROR_IO.getErrorCode()
+                    || what == IjkPlayerStatus.MEDIA_INFO_VIDEO_INTERRUPT.getErrorCode()
+                    || what == IjkPlayerStatus.MEDIA_ERROR_TIMED_OUT.getErrorCode()) {
+                currentState = STATE_ERROR;
+            }
             if (onInfoListener != null) {
                 return onInfoListener.onInfo(mp, what, extra);
             }

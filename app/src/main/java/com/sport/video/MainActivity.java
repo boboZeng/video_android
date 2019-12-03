@@ -1,6 +1,9 @@
 package com.sport.video;
 
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.video.live.NetWorkBroadcastReceiver;
 import com.video.live.OnBackListener;
 import com.video.live.SimpleVideoLayoutController;
 import com.video.live.VideoLayout;
@@ -18,8 +22,8 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 public class MainActivity extends AppCompatActivity {
     private VideoLayout videoLayout;
     private SimpleVideoLayoutController controller;
-    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/5759_push_5ddda0f46684e?wsTime=1575009617&wsSecret=d4323e657297dd55680d808bb29c0775";
-
+    //    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/5759_push_5ddda0f46684e?wsTime=1575009617&wsSecret=d4323e657297dd55680d808bb29c0775";
+    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/6200_push_5de5c9b0f2b86?wsTime=1575341112&wsSecret=bc2e361c5af7a1a77700b3176c4b630b";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +74,39 @@ public class MainActivity extends AppCompatActivity {
 
 //        controller.gotoScreenFullscreen();
 
-        if (NetworkUtils.isNetworkConnected(this)
-                && NetworkUtils.isMobileConnected(this)) {
+        if (VideoUtils.isNetworkConnected(this)
+                && VideoUtils.isMobileConnected(this)) {
             Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
         }
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(netWorkBroadcastReceiver, filter);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (videoLayout != null) {
+            if (videoLayout.getCurrentState() == VideoLayout.STATE_AUTO_PAUSED
+                    || videoLayout.getCurrentState() == VideoLayout.STATE_ERROR) {
+                videoLayout.load();
+            }
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (videoLayout != null) {
+            videoLayout.pause(true);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(netWorkBroadcastReceiver);
     }
 
     @Override
@@ -82,6 +115,23 @@ public class MainActivity extends AppCompatActivity {
                 && controller.onBackPressed()) {
             return;
         }
+        if (videoLayout != null) {
+            videoLayout.stop();
+            videoLayout.release();
+        }
         super.onBackPressed();
     }
+
+    private NetWorkBroadcastReceiver netWorkBroadcastReceiver = new NetWorkBroadcastReceiver() {
+        @Override
+        public void onConnect() {
+            if (videoLayout == null) {
+                return;
+            }
+            if (videoLayout.getCurrentState() == VideoLayout.STATE_AUTO_PAUSED
+                    || videoLayout.getCurrentState() == VideoLayout.STATE_ERROR) {
+                videoLayout.load();
+            }
+        }
+    };
 }
