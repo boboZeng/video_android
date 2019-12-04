@@ -43,6 +43,8 @@ public interface VideoController {
 
     String getVideoPath();
 
+    void setPath(String path);
+
     VideoLayout getVideoLayout();
 
     /**

@@ -46,6 +46,18 @@
             android:layout_alignParentRight="true"
             android:scaleType="centerInside"
             android:src="@drawable/video_enlarge" />
+
+
+        <TextView
+            android:id="@+id/tv_clarity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@id/fullscreen"
+            android:text="@string/clarity"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <View
@@ -178,4 +190,30 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:textColor="@android:color/holo_red_dark" />
+
+    <ImageView
+        android:id="@+id/img_lock"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="20dp"
+        android:paddingLeft="11dp"
+        android:paddingTop="10dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="11dp"
+        android:src="@drawable/video_icon_unlock"
+        android:visibility="gone" />
+
+
+    <LinearLayout
+        android:id="@+id/ll_clarity"
+        android:layout_width="@dimen/clarity_width"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="#a0000000"
+        android:orientation="vertical"
+        android:paddingTop="30dp"
+        android:paddingBottom="30dp"
+        android:visibility="gone" />
+
 </RelativeLayout>

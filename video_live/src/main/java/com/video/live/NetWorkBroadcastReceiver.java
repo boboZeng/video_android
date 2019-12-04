@@ -16,9 +16,9 @@ public abstract class NetWorkBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         VideoUtils.d("NetWorkBroadcastReceiver onReceive action:" + intent.getAction());
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-            onConnect();
+            onConnect(context);
         }
     }
 
-    public abstract void onConnect();
+    public abstract void onConnect(Context context);
 }

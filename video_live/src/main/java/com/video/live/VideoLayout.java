@@ -10,6 +10,8 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -77,6 +79,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
     private int currentState = STATE_IDLE;
     private boolean floatingMode = false;
     private int marginTop = 0;
+    private int playerStatusWhat = -1;
 
     public VideoLayout(@NonNull Context context) {
         this(context, null);
@@ -133,12 +136,12 @@ public class VideoLayout extends FrameLayout implements VideoController {
         videoLayoutController.setSurfaceViewVisibility(visibility);
     }
 
-
     /**
      * 设置播放地址
      *
      * @param path
      */
+    @Override
     public void setPath(String path) {
         setPath(path, null);
     }
@@ -146,6 +149,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
     public void setPath(String path, Map<String, String> header) {
         mPath = path;
         mHeader = header;
+        videoLayoutController.changePath();
     }
 
 
@@ -197,8 +201,8 @@ public class VideoLayout extends FrameLayout implements VideoController {
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "dns_cache_clear", 1);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "http-detect-range-support", 1);
 
-        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "timeout", 10000000);
-        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 5);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "timeout", 15000000);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 1);
 
         ijkMediaPlayer.setVolume(1.0f, 1.0f);
 
@@ -256,7 +260,9 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        System.out.println("ribory dispatchTouchEvent getAction:" + ev.getAction());
+        VideoUtils.d("VideoLayout dispatchTouchEvent getAction:" + ev.getAction());
+        VideoUtils.d("VideoLayout onMeasure width:" + getWidth()
+                + ",height:" + getHeight());
         float x = ev.getRawX();
         float y = ev.getRawY();
         if (ev.getAction() == MotionEvent.ACTION_MOVE) {
@@ -271,16 +277,16 @@ public class VideoLayout extends FrameLayout implements VideoController {
     }
 
     private void updateLocation(float x, float y) {
-        System.out.println("ribory updateLocation videoLayout:" + this);
+        VideoUtils.d("VideoLayout updateLocation videoLayout:" + this);
         if (this == null || !floatingMode) {
             return;
         }
-        System.out.println("ribory updateLocation x:" + x + ",y:" + y);
+        VideoUtils.d("VideoLayout updateLocation x:" + x + ",y:" + y);
         if (this.getLayoutParams() instanceof LinearLayout.LayoutParams) {
 
             LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.getLayoutParams();
 
-            System.out.println("ribory updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
+            VideoUtils.d("VideoLayout updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
                     + layoutParams.leftMargin);
             int calculateTop = layoutParams.topMargin += y;
             int calculateLeft = layoutParams.leftMargin += x;
@@ -297,7 +303,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
         } else if (this.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
 
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) this.getLayoutParams();
-            System.out.println("ribory updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
+            VideoUtils.d("VideoLayout updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
                     + layoutParams.leftMargin);
             int calculateTop = layoutParams.topMargin += y;
             int calculateLeft = layoutParams.leftMargin += x;
@@ -387,6 +393,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
             mMediaPlayer.pause();
             mAudioFocusHelper.abandonFocus();
         }
+        mHandler.removeMessages(VideoConstants.VideoWhat.WHAT_BUFFERING);
     }
 
     @Override
@@ -398,6 +405,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
             mAudioFocusHelper.abandonFocus();
             VideoUtils.cancelScreenOn((Activity) getContext());
         }
+        mHandler.removeMessages(VideoConstants.VideoWhat.WHAT_BUFFERING);
     }
 
     @Override
@@ -413,6 +421,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
         if (videoLayoutController != null) {
             videoLayoutController.release();
         }
+        mHandler.removeMessages(VideoConstants.VideoWhat.WHAT_BUFFERING);
     }
 
     @Override
@@ -594,11 +603,16 @@ public class VideoLayout extends FrameLayout implements VideoController {
         @Override
         public boolean onError(IMediaPlayer mp, int what, int extra) {
             currentState = STATE_ERROR;
+            bufferingStartTime = -1;
             VideoUtils.d("VideoLayout onError what:" + what + ",extra:" + extra);
-
             videoLayoutController.setMessage(IjkPlayerStatus.getErrorMessageByErrorCode(what));
             videoLayoutController.setLoadingVisibility(View.GONE);
 
+            if (playerStatusWhat == IjkPlayerStatus.MEDIA_INFO_BUFFERING_END.getErrorCode()
+                    && what == IjkPlayerStatus.MEDIA_INFO_VIDEO_INTERRUPT.getErrorCode()) {
+                load();
+            }
+            playerStatusWhat = what;
             if (onErrorListener != null) {
                 return onErrorListener.onError(mp, what, extra);
             }
@@ -606,16 +620,25 @@ public class VideoLayout extends FrameLayout implements VideoController {
         }
     };
 
-
+    private long bufferingStartTime = -1;
     private IMediaPlayer.OnInfoListener mInfoListener = new IMediaPlayer.OnInfoListener() {
 
         @Override
         public boolean onInfo(IMediaPlayer mp, int what, int extra) {
             VideoUtils.d("VideoLayout onInfo what:" + what + ",extra:" + extra);
+            playerStatusWhat = what;
             if (what == IjkPlayerStatus.MEDIA_ERROR_IO.getErrorCode()
                     || what == IjkPlayerStatus.MEDIA_INFO_VIDEO_INTERRUPT.getErrorCode()
                     || what == IjkPlayerStatus.MEDIA_ERROR_TIMED_OUT.getErrorCode()) {
                 currentState = STATE_ERROR;
+            }
+            if (what == IjkPlayerStatus.MEDIA_INFO_BUFFERING_START.getErrorCode()) {
+                videoLayoutController.setLoadingVisibility(View.VISIBLE);
+                bufferingStartTime = System.currentTimeMillis();
+                mHandler.sendEmptyMessage(VideoConstants.VideoWhat.WHAT_BUFFERING);
+            } else if (what == IjkPlayerStatus.MEDIA_INFO_BUFFERING_END.getErrorCode()) {
+                videoLayoutController.setLoadingVisibility(View.GONE);
+                bufferingStartTime = -1;
             }
             if (onInfoListener != null) {
                 return onInfoListener.onInfo(mp, what, extra);
@@ -687,6 +710,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
     private IMediaPlayer.OnInfoListener onInfoListener;
     private IMediaPlayer.OnTimedTextListener onTimedTextListener;
     private IjkMediaPlayer.OnNativeInvokeListener onNativeInvokeListener;
+    private OnCustomInfoListener onCustomInfoListener;
 
 
     public void setOnCompletionListener(IMediaPlayer.OnCompletionListener onCompletionListener) {
@@ -725,6 +749,10 @@ public class VideoLayout extends FrameLayout implements VideoController {
         this.onNativeInvokeListener = onNativeInvokeListener;
     }
 
+    public void setOnCustomInfoListener(OnCustomInfoListener onCustomInfoListener) {
+        this.onCustomInfoListener = onCustomInfoListener;
+    }
+
     public void setAspectRatio(float ratio) {
         this.aspectRatio = ratio;
     }
@@ -756,4 +784,25 @@ public class VideoLayout extends FrameLayout implements VideoController {
         }
     }
     //</editor-fold>
+
+    Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            VideoUtils.d("VideoLayout handleMessage start");
+            if (msg.what == VideoConstants.VideoWhat.WHAT_BUFFERING) {
+                VideoUtils.d("VideoLayout handleMessage what:" + VideoConstants.VideoWhat.WHAT_BUFFERING);
+                if (bufferingStartTime == -1 || !videoLayoutController.isSupportChangeClarity()) {
+                    return;
+                }
+                if (onCustomInfoListener != null
+                        && System.currentTimeMillis() - bufferingStartTime > 10000) {
+                    onCustomInfoListener.onCustomInfo(VideoConstants.VideoCustomStatus.BUFFERING_TIMEOUT);
+                    return;
+                }
+                sendEmptyMessageDelayed(VideoConstants.VideoWhat.WHAT_BUFFERING, 1000);
+            }
+        }
+    };
 }
