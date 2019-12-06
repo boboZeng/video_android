@@ -4,21 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
-import android.util.SparseArray;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
 import com.video.live.ClarityModel;
 import com.video.live.IjkPlayerStatus;
-import com.video.live.NetWorkBroadcastReceiver;
+import com.video.live.NetWorkBroadcastManager;
 import com.video.live.OnBackListener;
 import com.video.live.OnCustomInfoListener;
 import com.video.live.SimpleVideoLayoutController;
@@ -36,13 +31,29 @@ public class MainActivity extends AppCompatActivity {
     private SimpleVideoLayoutController controller;
     //    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/5759_push_5ddda0f46684e?wsTime=1575009617&wsSecret=d4323e657297dd55680d808bb29c0775";
     private String path = "rtmp://wslive.undemonstrable.cn/wslive1/6390_pull_5de86b5979f62?wsTime=1575513019&wsSecret=1691ce2824fce2dbadcbad088b77e6a3";
+    private NetWorkBroadcastManager netWorkBroadcastManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         VideoUtils.setEnableDebug(true);
-
+        netWorkBroadcastManager = new NetWorkBroadcastManager(new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isConnected) {
+                if (VideoUtils.isNetworkConnected(MainActivity.this)
+                        && VideoUtils.isMobileConnected(MainActivity.this)) {
+                    Toast.makeText(MainActivity.this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
+                }
+                if (videoLayout == null || !isConnected || isFinishing()) {
+                    return;
+                }
+                if (videoLayout.getCurrentState() == VideoLayout.STATE_AUTO_PAUSED
+                        || videoLayout.getCurrentState() == VideoLayout.STATE_ERROR) {
+                    MainActivity.this.runOnUiThread(() -> videoLayout.load());
+                }
+            }
+        });
         videoLayout = findViewById(R.id.videoLayout);
         videoLayout.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
             @Override
@@ -123,12 +134,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (VideoUtils.isNetworkConnected(this)
-                && VideoUtils.isMobileConnected(this)) {
+                && !VideoUtils.isWifiConnected(this)) {
             Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
         }
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(netWorkBroadcastReceiver, filter);
+
+        netWorkBroadcastManager.registerReceiver(this);
     }
 
     @Override
@@ -153,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(netWorkBroadcastReceiver);
+        netWorkBroadcastManager.unregisterReceiver(this);
     }
 
     @Override
@@ -169,20 +179,5 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    private NetWorkBroadcastReceiver netWorkBroadcastReceiver = new NetWorkBroadcastReceiver() {
-        @Override
-        public void onConnect(Context context) {
-            if (VideoUtils.isNetworkConnected(context)
-                    && VideoUtils.isMobileConnected(context)) {
-                Toast.makeText(context, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
-            }
-            if (videoLayout == null) {
-                return;
-            }
-            if (videoLayout.getCurrentState() == VideoLayout.STATE_AUTO_PAUSED
-                    || videoLayout.getCurrentState() == VideoLayout.STATE_ERROR) {
-                videoLayout.load();
-            }
-        }
-    };
+
 }
