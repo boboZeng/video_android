@@ -5,8 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -26,6 +28,7 @@ public class VideoUtils {
 
     /**
      * 是否可以调试
+     *
      * @param enableDebug
      */
     public static void setEnableDebug(boolean enableDebug) {
@@ -37,7 +40,7 @@ public class VideoUtils {
     }
 
     public static void d(String str) {
-        if(enableDebug){
+        if (enableDebug) {
             Log.d("VideoUtils", str);
         }
     }
@@ -59,17 +62,7 @@ public class VideoUtils {
         }
     }
 
-    /**
-     * This method requires the caller to hold the permission ACCESS_NETWORK_STATE.
-     *
-     * @param context context
-     * @return if wifi is connected,return true
-     */
-    public static boolean isWifiConnected(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI;
-    }
+
 
     /**
      * Get activity from context object
@@ -176,6 +169,146 @@ public class VideoUtils {
     public static void showSystemUI(Context context) {
         int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
         VideoUtils.getWindow(context).getDecorView().setSystemUiVisibility(SYSTEM_UI);
+    }
+
+    /**
+     * 屏幕宽
+     *
+     * @param context
+     * @return
+     */
+    public static int getscreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(
+                Context.WINDOW_SERVICE);
+        DisplayMetrics metric = new DisplayMetrics();
+        //API 17之后使用，获取的像素宽高包含虚拟键所占空间，在API 17之前通过反射获取
+        //        context.getWindowManager().getDefaultDisplay().getRealMetrics(metric);
+        //获取的像素宽高不包含虚拟键所占空间
+        wm.getDefaultDisplay().getMetrics(metric);
+        return metric.widthPixels;  // 宽度（像素）
+    }
+
+    /**
+     * 屏幕高
+     *
+     * @param context
+     * @return
+     */
+    public static int getscreenhHeight(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(
+                Context.WINDOW_SERVICE);
+        DisplayMetrics metric = new DisplayMetrics();
+        //API 17之后使用，获取的像素宽高包含虚拟键所占空间，在API 17之前通过反射获取
+        //        context.getWindowManager().getDefaultDisplay().getRealMetrics(metric);
+        //获取的像素宽高不包含虚拟键所占空间
+        wm.getDefaultDisplay().getMetrics(metric);
+        return metric.heightPixels;  // 宽度（像素）
+    }
+
+    public static int getNavigetionHeight(Context context) {
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+        return 0;
+    }
+
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    /**
+     * Keep Screen on
+     */
+    public static void keepScreenOn(Activity activity) {
+        if (activity != null)
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    /**
+     * Cancel keep Screen on
+     *
+     * @param activity
+     */
+    public static void cancelScreenOn(Activity activity) {
+        if (activity != null)
+            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+
+    /**
+     * 判断是否有网络连接
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isNetworkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isConnected();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断WIFI网络是否可用
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isWifiConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mWiFiNetworkInfo = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            if (mWiFiNetworkInfo != null) {
+                return mWiFiNetworkInfo.isConnected();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断MOBILE网络是否可用
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isMobileConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mMobileNetworkInfo = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+            if (mMobileNetworkInfo != null) {
+                return mMobileNetworkInfo.isConnected();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获取当前网络连接的类型信息
+     *
+     * @param context
+     * @return
+     */
+    public static int getConnectedType(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null && mNetworkInfo.isConnected()) {
+                return mNetworkInfo.getType();
+            }
+        }
+        return -1;
     }
 
 }

@@ -1,0 +1,71 @@
+
+int MEDIA_INFO_BUFFERING_START = 701;
+int MEDIA_INFO_BUFFERING_END = 702;
+
+
+
+正常情况下log：
+2019-11-29 14:49:52.464 7872-7872/com.sport.video D/VideoUtils: VideoLayout onMeasure specWidth:1080,specHeight:604
+2019-11-29 14:49:52.499 7872-7872/com.sport.video D/VideoUtils: VideoLayout onMeasure specWidth:1080,specHeight:604
+2019-11-29 14:49:52.516 7872-7872/com.sport.video D/VideoUtils: VideoLayout createSurfaceView surfaceCreated
+2019-11-29 14:49:52.516 7872-7872/com.sport.video D/VideoUtils: VideoLayout createSurfaceView surfaceChanged
+2019-11-29 14:49:56.559 7872-7872/com.sport.video D/VideoUtils: VideoLayout onMeasure specWidth:1080,specHeight:604
+2019-11-29 14:49:56.561 7872-7933/com.sport.video D/VideoUtils: VideoLayout onNativeInvoke i:131073
+2019-11-29 14:49:56.571 7872-7933/com.sport.video D/VideoUtils: VideoLayout onNativeInvoke i:131074
+2019-11-29 14:49:56.724 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:10005,extra:0
+2019-11-29 14:49:56.885 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:10006,extra:0
+2019-11-29 14:49:56.934 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:10007,extra:0
+2019-11-29 14:49:56.935 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:10002,extra:0
+2019-11-29 14:49:56.935 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged width:1092,height:614
+2019-11-29 14:49:56.935 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged sar_num:0,sar_den:0
+2019-11-29 14:49:56.935 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged width:1092,height:614
+2019-11-29 14:49:56.935 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged sar_num:1,sar_den:1
+2019-11-29 14:49:56.935 7872-7872/com.sport.video D/VideoUtils: VideoLayout onPrepared:
+2019-11-29 14:49:56.939 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:10001,extra:0
+2019-11-29 14:49:56.940 7872-7872/com.sport.video D/VideoUtils: VideoLayout onMeasure specWidth:1080,specHeight:604
+2019-11-29 14:49:56.946 7872-7872/com.sport.video D/VideoUtils: VideoLayout createSurfaceView surfaceChanged
+2019-11-29 14:49:56.954 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:49:57.001 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:49:57.015 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged width:1092,height:614
+2019-11-29 14:49:57.015 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged sar_num:1,sar_den:1
+2019-11-29 14:49:57.026 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:10004,extra:0
+2019-11-29 14:49:57.026 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged width:1092,height:614
+2019-11-29 14:49:57.026 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged sar_num:1,sar_den:1
+2019-11-29 14:49:57.039 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:10003,extra:0
+2019-11-29 14:49:57.045 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged width:1092,height:614
+2019-11-29 14:49:57.045 7872-7872/com.sport.video D/VideoUtils: VideoLayout onVideoSizeChanged sar_num:1,sar_den:1
+2019-11-29 14:49:57.049 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:3,extra:0
+2019-11-29 14:49:57.513 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:49:59.491 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:50:00.417 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+
+切换网络下log(直播停止)
+2019-11-29 14:50:57.802 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:701,extra:0
+第二次切换（会继续播放，后面info data interrupt）
+2019-11-29 14:51:46.048 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:51:46.687 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:51:46.747 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:51:46.748 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:702,extra:0
+2019-11-29 14:51:49.644 7872-7872/com.sport.video D/VideoUtils: VideoLayout onError what:-10000,extra:0
+
+
+断网播放下log
+2019-11-29 14:54:56.544 7872-7872/com.sport.video D/VideoUtils: VideoLayout onError what:-10000,extra:0
+2019-11-29 14:54:56.558 7872-7872/com.sport.video D/VideoUtils: VideoLayout onMeasure specWidth:1080,specHeight:604
+
+飞行模式下log：
+VideoLayout onError what:-10000,extra:0
+
+
+
+2019-11-29 14:57:29.505 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:701,extra:0
+2019-11-29 14:57:29.766 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:57:31.480 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:57:38.306 7872-7872/com.sport.video D/VideoUtils: VideoLayout onBufferingUpdate percent:0
+2019-11-29 14:57:38.310 7872-7872/com.sport.video D/VideoUtils: VideoLayout onInfo what:702,extra:0
+出现是加载中卡顿
+
+
+
+org.fourthline.cling.binding.xml.DescriptorBindingException: Could not parse service descriptor:
+ java.lang.RuntimeException: org.xml.sax.SAXNotRecognizedException: http://apache.org/xml/features/disallow-doctype-decl

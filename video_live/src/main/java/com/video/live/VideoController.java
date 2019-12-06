@@ -20,6 +20,11 @@ public interface VideoController {
 
     void pause();
 
+    /**
+     * @param isAutoPause true :自动暂停，回来要继续播放（如按home建)
+     */
+    void pause(boolean isAutoPause);
+
     void stop();
 
     void release();
@@ -37,6 +42,8 @@ public interface VideoController {
     boolean isPausing();
 
     String getVideoPath();
+
+    void setPath(String path);
 
     VideoLayout getVideoLayout();
 

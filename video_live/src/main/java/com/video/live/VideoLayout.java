@@ -1,5 +1,6 @@
 package com.video.live;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,14 +10,19 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,13 +44,15 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
  * Created by ribory on 2019-10-21.
  **/
 public class VideoLayout extends FrameLayout implements VideoController {
-    private static final int STATE_IDLE = 0;//闲置
-    private static final int STATE_PREPARING = 1;//正在预加载
-    private static final int STATE_PREPARED = 2;//预加载完成
-    private static final int STATE_PLAYING = 3;//正在播放
-    private static final int STATE_PAUSED = 4;//暂停
-    private static final int STATE_STOP = 5;//停止
-    private static final int STATE_PLAYBACK_COMPLETED = 6;//播放完成
+    public static final int STATE_IDLE = 0;//闲置
+    public static final int STATE_PREPARING = 1;//正在预加载
+    public static final int STATE_PREPARED = 2;//预加载完成
+    public static final int STATE_PLAYING = 3;//正在播放
+    public static final int STATE_PAUSED = 4;//暂停
+    public static final int STATE_STOP = 5;//停止
+    public static final int STATE_PLAYBACK_COMPLETED = 6;//播放完成
+    public static final int STATE_ERROR = 7;//播放出错
+    public static final int STATE_AUTO_PAUSED = 8;//自动暂停，（如按home建），回来要继续播放
 
     /**
      * 由ijkplayer提供，用于播放视频，需要给他传入一个surfaceView
@@ -67,8 +75,11 @@ public class VideoLayout extends FrameLayout implements VideoController {
     private AudioFocusHelper mAudioFocusHelper;
     private int layout;
     private float aspectRatio = 9 / 16f;
-    private VideoLayoutController videoLayoutController;
+    public VideoLayoutController videoLayoutController;
     private int currentState = STATE_IDLE;
+    private boolean floatingMode = false;
+    private int marginTop = 0;
+    private int playerStatusWhat = -1;
 
     public VideoLayout(@NonNull Context context) {
         this(context, null);
@@ -125,22 +136,20 @@ public class VideoLayout extends FrameLayout implements VideoController {
         videoLayoutController.setSurfaceViewVisibility(visibility);
     }
 
-
     /**
      * 设置播放地址
      *
      * @param path
      */
+    @Override
     public void setPath(String path) {
         setPath(path, null);
     }
 
     public void setPath(String path, Map<String, String> header) {
-        if (VideoUtils.isNullOrEmpty(path)) {
-            return;
-        }
         mPath = path;
         mHeader = header;
+        videoLayoutController.changePath();
     }
 
 
@@ -192,8 +201,8 @@ public class VideoLayout extends FrameLayout implements VideoController {
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "dns_cache_clear", 1);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "http-detect-range-support", 1);
 
-        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "timeout", 10000000);
-        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 5);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "timeout", 15000000);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 1);
 
         ijkMediaPlayer.setVolume(1.0f, 1.0f);
 
@@ -232,7 +241,11 @@ public class VideoLayout extends FrameLayout implements VideoController {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
-        int specWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int specWidth = 0;
+        if (floatingMode) {
+            specWidth = (int) (VideoUtils.getscreenWidth(getContext()) * 0.4);
+        } else
+            specWidth = VideoUtils.getscreenWidth(getContext());
         int specHeight = (int) (specWidth * aspectRatio);
         VideoUtils.d("VideoLayout onMeasure specWidth:" + specWidth
                 + ",specHeight:" + specHeight);
@@ -243,11 +256,77 @@ public class VideoLayout extends FrameLayout implements VideoController {
         getChildAt(0).measure(childWidthMeasureSpec, childHeightMeasureSpec);
     }
 
+    float nextX, nextY;
 
-    //<editor-fold desc="VideoController">
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        VideoUtils.d("VideoLayout dispatchTouchEvent getAction:" + ev.getAction());
+        VideoUtils.d("VideoLayout onMeasure width:" + getWidth()
+                + ",height:" + getHeight());
+        float x = ev.getRawX();
+        float y = ev.getRawY();
+        if (ev.getAction() == MotionEvent.ACTION_MOVE) {
+            float moveX = x - nextX;
+            float moveY = y - nextY;
+            updateLocation(moveX, moveY);
+        }
+        nextX = x;
+        nextY = y;
+
+        return super.dispatchTouchEvent(ev);
+    }
+
+    private void updateLocation(float x, float y) {
+        VideoUtils.d("VideoLayout updateLocation videoLayout:" + this);
+        if (this == null || !floatingMode) {
+            return;
+        }
+        VideoUtils.d("VideoLayout updateLocation x:" + x + ",y:" + y);
+        if (this.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.getLayoutParams();
+
+            VideoUtils.d("VideoLayout updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
+                    + layoutParams.leftMargin);
+            int calculateTop = layoutParams.topMargin += y;
+            int calculateLeft = layoutParams.leftMargin += x;
+            if (calculateTop > (VideoUtils.getscreenhHeight(getContext()) - VideoUtils.getStatusBarHeight(getContext()) - VideoUtils.getNavigetionHeight(getContext()) - this.getHeight() * 0.8)//下
+                    || calculateTop < (-this.getHeight() * 0.6) //上
+                    || calculateLeft < (-this.getWidth() * 0.6)//左
+                    || calculateLeft > (VideoUtils.getscreenWidth(getContext()) - this.getHeight() * 0.8)) {//右
+                stop();
+                this.setVisibility(View.GONE);
+            } else {
+                layoutParams.topMargin = calculateTop;
+                layoutParams.leftMargin = calculateLeft;
+            }
+        } else if (this.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) this.getLayoutParams();
+            VideoUtils.d("VideoLayout updateLocation topMargin:" + layoutParams.topMargin + ",leftMargin:"
+                    + layoutParams.leftMargin);
+            int calculateTop = layoutParams.topMargin += y;
+            int calculateLeft = layoutParams.leftMargin += x;
+
+            if (calculateTop > (VideoUtils.getscreenhHeight(getContext()) - VideoUtils.getStatusBarHeight(getContext()) - VideoUtils.getNavigetionHeight(getContext()) - this.getHeight() * 0.8)//下
+                    || calculateTop < (-this.getHeight() * 0.6) //上
+                    || calculateLeft < (-this.getWidth() * 0.6)//左
+                    || calculateLeft > (VideoUtils.getscreenWidth(getContext()) - this.getHeight() * 0.8)) {//右
+                stop();
+                this.setVisibility(View.GONE);
+            } else {
+                layoutParams.topMargin = calculateTop;
+                layoutParams.leftMargin = calculateLeft;
+            }
+        }
+
+        this.requestLayout();
+    }
+//<editor-fold desc="VideoController">
 
     @Override
     public void load() {
+        videoLayoutController.clearMessage();
         if (VideoUtils.isNullOrEmpty(mPath)) {
             return;
         }
@@ -283,6 +362,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
             }
 //            mMediaPlayer.setDataSource(mContext, mUri, mHeader);
             mMediaPlayer.prepareAsync();
+            VideoUtils.keepScreenOn((Activity) getContext());
         } catch (IOException e) {
             e.printStackTrace();
             currentState = STATE_IDLE;
@@ -302,12 +382,18 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
     @Override
     public void pause() {
+        pause(false);
+    }
+
+    @Override
+    public void pause(boolean isAutoPause) {
         if (mMediaPlayer != null) {
-            currentState = STATE_PAUSED;
+            currentState = isAutoPause ? STATE_AUTO_PAUSED : STATE_PAUSED;
             videoLayoutController.setPlayImageResource(R.drawable.video_sel_play);
             mMediaPlayer.pause();
             mAudioFocusHelper.abandonFocus();
         }
+        mHandler.removeMessages(VideoConstants.VideoWhat.WHAT_BUFFERING);
     }
 
     @Override
@@ -317,7 +403,9 @@ public class VideoLayout extends FrameLayout implements VideoController {
             videoLayoutController.setPlayImageResource(R.drawable.video_sel_play);
             mMediaPlayer.stop();
             mAudioFocusHelper.abandonFocus();
+            VideoUtils.cancelScreenOn((Activity) getContext());
         }
+        mHandler.removeMessages(VideoConstants.VideoWhat.WHAT_BUFFERING);
     }
 
     @Override
@@ -328,10 +416,12 @@ public class VideoLayout extends FrameLayout implements VideoController {
             mMediaPlayer.release();
             mMediaPlayer = null;
             mAudioFocusHelper.abandonFocus();
+            VideoUtils.cancelScreenOn((Activity) getContext());
         }
         if (videoLayoutController != null) {
             videoLayoutController.release();
         }
+        mHandler.removeMessages(VideoConstants.VideoWhat.WHAT_BUFFERING);
     }
 
     @Override
@@ -379,7 +469,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
     @Override
     public boolean isPausing() {
-        return currentState == STATE_PAUSED;
+        return currentState == STATE_PAUSED || currentState == STATE_AUTO_PAUSED;
     }
 
     @Override
@@ -512,8 +602,17 @@ public class VideoLayout extends FrameLayout implements VideoController {
 
         @Override
         public boolean onError(IMediaPlayer mp, int what, int extra) {
-            currentState = STATE_IDLE;
+            currentState = STATE_ERROR;
+            bufferingStartTime = -1;
             VideoUtils.d("VideoLayout onError what:" + what + ",extra:" + extra);
+            videoLayoutController.setMessage(IjkPlayerStatus.getErrorMessageByErrorCode(what));
+            videoLayoutController.setLoadingVisibility(View.GONE);
+
+            if (playerStatusWhat == IjkPlayerStatus.MEDIA_INFO_BUFFERING_END.getErrorCode()
+                    && what == IjkPlayerStatus.MEDIA_INFO_VIDEO_INTERRUPT.getErrorCode()) {
+                load();
+            }
+            playerStatusWhat = what;
             if (onErrorListener != null) {
                 return onErrorListener.onError(mp, what, extra);
             }
@@ -521,12 +620,26 @@ public class VideoLayout extends FrameLayout implements VideoController {
         }
     };
 
-
+    private long bufferingStartTime = -1;
     private IMediaPlayer.OnInfoListener mInfoListener = new IMediaPlayer.OnInfoListener() {
 
         @Override
         public boolean onInfo(IMediaPlayer mp, int what, int extra) {
             VideoUtils.d("VideoLayout onInfo what:" + what + ",extra:" + extra);
+            playerStatusWhat = what;
+            if (what == IjkPlayerStatus.MEDIA_ERROR_IO.getErrorCode()
+                    || what == IjkPlayerStatus.MEDIA_INFO_VIDEO_INTERRUPT.getErrorCode()
+                    || what == IjkPlayerStatus.MEDIA_ERROR_TIMED_OUT.getErrorCode()) {
+                currentState = STATE_ERROR;
+            }
+            if (what == IjkPlayerStatus.MEDIA_INFO_BUFFERING_START.getErrorCode()) {
+                videoLayoutController.setLoadingVisibility(View.VISIBLE);
+                bufferingStartTime = System.currentTimeMillis();
+                mHandler.sendEmptyMessage(VideoConstants.VideoWhat.WHAT_BUFFERING);
+            } else if (what == IjkPlayerStatus.MEDIA_INFO_BUFFERING_END.getErrorCode()) {
+                videoLayoutController.setLoadingVisibility(View.GONE);
+                bufferingStartTime = -1;
+            }
             if (onInfoListener != null) {
                 return onInfoListener.onInfo(mp, what, extra);
             }
@@ -597,6 +710,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
     private IMediaPlayer.OnInfoListener onInfoListener;
     private IMediaPlayer.OnTimedTextListener onTimedTextListener;
     private IjkMediaPlayer.OnNativeInvokeListener onNativeInvokeListener;
+    private OnCustomInfoListener onCustomInfoListener;
 
 
     public void setOnCompletionListener(IMediaPlayer.OnCompletionListener onCompletionListener) {
@@ -634,5 +748,61 @@ public class VideoLayout extends FrameLayout implements VideoController {
     public void setOnNativeInvokeListener(IjkMediaPlayer.OnNativeInvokeListener onNativeInvokeListener) {
         this.onNativeInvokeListener = onNativeInvokeListener;
     }
+
+    public void setOnCustomInfoListener(OnCustomInfoListener onCustomInfoListener) {
+        this.onCustomInfoListener = onCustomInfoListener;
+    }
+
+    public void setAspectRatio(float ratio) {
+        this.aspectRatio = ratio;
+    }
+
+    public void setFloatingMode(boolean open) {
+        this.floatingMode = open;
+
+        if (getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) getLayoutParams();
+            params.leftMargin = (int) (VideoUtils.getscreenWidth(getContext()) * 0.55);
+            params.topMargin = (int) (VideoUtils.getscreenhHeight(getContext()) * 0.05);
+            setLayoutParams(params);
+        } else if (getLayoutParams() instanceof LinearLayout.LayoutParams) {
+            //暫時不做
+        }
+
+    }
+
+    public void setMarginTop(int top) {
+        this.marginTop = top;
+        if (getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) getLayoutParams();
+            params.setMargins(params.leftMargin, top, params.rightMargin, params.bottomMargin);
+            setLayoutParams(params);
+        } else if (getLayoutParams() instanceof LinearLayout.LayoutParams) {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) getLayoutParams();
+            params.setMargins(params.leftMargin, top, params.rightMargin, params.bottomMargin);
+            setLayoutParams(params);
+        }
+    }
     //</editor-fold>
+
+    Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            VideoUtils.d("VideoLayout handleMessage start");
+            if (msg.what == VideoConstants.VideoWhat.WHAT_BUFFERING) {
+                VideoUtils.d("VideoLayout handleMessage what:" + VideoConstants.VideoWhat.WHAT_BUFFERING);
+                if (bufferingStartTime == -1 || !videoLayoutController.isSupportChangeClarity()) {
+                    return;
+                }
+                if (onCustomInfoListener != null
+                        && System.currentTimeMillis() - bufferingStartTime > 10000) {
+                    onCustomInfoListener.onCustomInfo(VideoConstants.VideoCustomStatus.BUFFERING_TIMEOUT);
+                    return;
+                }
+                sendEmptyMessageDelayed(VideoConstants.VideoWhat.WHAT_BUFFERING, 1000);
+            }
+        }
+    };
 }

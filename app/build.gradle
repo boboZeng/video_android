@@ -5,11 +5,16 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.sport.video"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // dex突破65535的限制
+        multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
+
 
         ndk {
             //设置支持的SO库架构
@@ -17,11 +22,30 @@ android {
             abiFilters "armeabi-v7a", "x86"
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/beans.xml'
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+        preDexLibraries = false
+    }
+
     buildTypes {
+        debug {
+            minifyEnabled false
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
     }
 
 
@@ -35,15 +59,34 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation project(":video_live")
+    implementation project(":video_airplay")
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation('com.android.support:multidex:1.0.1')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
 
-    implementation(name: 'ijkplayer-armv7a-release', ext: 'aar')
-    implementation(name: 'ijkplayer-x86-release', ext: 'aar')
-    implementation(name: 'ijkplayer-java-release', ext: 'aar')
+    implementation 'tv.danmaku.ijk.media:ijkplayer-armv5:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-arm64:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-x86_64:0.8.8'
+    implementation(name: 'swiperefreshlayout-1.1.0-alpha03', ext: 'aar')
+
+
+//    implementation(name: 'ijkplayer-armv7a-release', ext: 'aar')
+//    implementation(name: 'ijkplayer-x86-release', ext: 'aar')
+//    implementation(name: 'ijkplayer-java-release', ext: 'aar')
+
+
+//    implementation 'org.fourthline.cling:cling-core:2.1.1'
+//    implementation 'org.fourthline.cling:cling-support:2.1.1'
+
+//    implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '10.0.0-alpha0'
+//    implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '10.0.0-alpha0'
+//    implementation group: 'org.eclipse.jetty', name: 'jetty-client', version: '10.0.0-alpha0'
 }

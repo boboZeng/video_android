@@ -6,6 +6,8 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.DrawableRes;
 
+import java.util.List;
+
 /**
  * fileDesc
  * <p>
@@ -24,16 +26,21 @@ public abstract class VideoLayoutController {
 
     /**
      * 显示视频画面的SurfaceView
+     *
      * @param visibility
      */
     public abstract void setSurfaceViewVisibility(int visibility);
 
     /**
      * 加载动画显示
+     *
      * @param visibility
      */
     public abstract void setLoadingVisibility(int visibility);
 
+    public abstract void setMessage(String message);
+
+    public abstract void clearMessage();
 
     /**
      * 暂停播放按钮
@@ -46,4 +53,21 @@ public abstract class VideoLayoutController {
 
     public abstract void release();
 
+    /**
+     * 播放地址改变
+     */
+    public abstract void changePath();
+
+    /**
+     * 设置支持清晰度列表
+     *
+     * @param clarityList
+     */
+    public abstract void setClarityList(List<ClarityModel> clarityList);
+
+    /**
+     * 是否支持清晰度切换
+     * @return
+     */
+    public abstract boolean isSupportChangeClarity();
 }
