@@ -1,24 +1,27 @@
-1。基于https://github.com/Bilibili/ijkplayer
+## *说明*：
+1.基于https://github.com/Bilibili/ijkplayer
 
-2。修复支持https
+2.修复支持https
         参考：https://www.imooc.com/article/33930
 
+## *使用文档*
 
+### 一、提示用户4G还是Wifi
 
-###一、提示用户4G还是Wifi
-
->需求：进入直播页面如果是非Wifi提示用户网络情况；
+> 需求：进入直播页面如果是非Wifi提示用户网络情况；
 ```
-        if (VideoUtils.isNetworkConnected(this)
-                && !VideoUtils.isWifiConnected(this)) {
-            Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
-        }
-````
-
-###二、自动续播
->需求：1.切换到后台、按home键或另外页面打开,
+if (VideoUtils.isNetworkConnected(this)
+       && !VideoUtils.isWifiConnected(this)) {
+     Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
+}
 ```
-    #需要调用方法保存状态
+
+### 二、自动续播
+
+> 需求：1.切换到后台、按home键或另外页面打开；
+
+```
+    //需要调用方法保存状态
     @Override
     public void onStop() {
         super.onStop();
@@ -27,7 +30,7 @@
         }
     }
 
-    #自动续播
+    //自动续播
     @Override
     protected void onResume() {
         super.onResume();
@@ -40,26 +43,24 @@
     }
 ```
 
->需求：2.网络不好，播放出错，恢复网络情况
+> 需求：2.网络不好，播放出错，恢复网络情况
+
 ```
     private NetWorkBroadcastManager netWorkBroadcastManager;
-
-    #注册
+    //注册
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
               netWorkBroadcastManager = new NetWorkBroadcastManager(netWorkBroadcastManagerObserver);
         netWorkBroadcastManager.registerReceiver(this);
     }
-
-    #移除
+     //移除
     @Override
     protected void onDestroy() {
         super.onDestroy();
         netWorkBroadcastManager.unregisterReceiver(this);
     }
-
-    #状态变化监听
+     //状态变化监听
     private Observer netWorkBroadcastManagerObserver =  new Observer<Boolean>() {
           @Override
           public void onChanged(Boolean aBoolean) {
@@ -79,9 +80,10 @@
 
 ```
 
+### 三、自定义状态播放器提示
 
-###三、自定义状态播放器提示
->需求：1、缓冲超过10s
+> 需求：1、缓冲超过10s
+
 ```
    videoLayout.setOnCustomInfoListener(new OnCustomInfoListener() {
             @Override
@@ -92,12 +94,15 @@
             }
         });
 ```
-###四、播放最新时间点
+
+### 四、播放最新时间点
+
 ```
 videoLayout.load()
 
 ```
-###五、支持多清晰度
+
+### 五、支持多清晰度
 ```
         List<ClarityModel> clarityList = new ArrayList<>();
         ClarityModel model_1 = new ClarityModel("1080P", "rtmp://58.200.131.2:1935/livetv/hunantv");
