@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private VideoLayout videoLayout;
     private SimpleVideoLayoutController controller;
     //    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/5759_push_5ddda0f46684e?wsTime=1575009617&wsSecret=d4323e657297dd55680d808bb29c0775";
-    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/6390_pull_5de86b5979f62?wsTime=1575513019&wsSecret=1691ce2824fce2dbadcbad088b77e6a3";
+    private String path = "rtmp://58.200.131.2:1935/livetv/hunantv";
     private NetWorkBroadcastManager netWorkBroadcastManager;
 
     @Override
@@ -97,19 +97,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        List<ClarityModel> clarityList = new ArrayList<>();
-        ClarityModel model_1 = new ClarityModel("1080P", "rtmp://58.200.131.2:1935/livetv/hunantv");
-        clarityList.add(model_1);
-        ClarityModel model_2 = new ClarityModel("720P",
-                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c?wsTime=1575525184&wsSecret=34e467150476d3dc71a451a402e756a2");
-        clarityList.add(model_2);
-        ClarityModel model_3 = new ClarityModel("480P",
-                "rtmp://fms.105.net/live/rmc1");
-//                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c_480p?wsTime=1575525184&wsSecret=2a60f7cc92a584301a9fe3e84711d35b");
-        clarityList.add(model_3);
-        ClarityModel model_4 = new ClarityModel("360P", "rtmp://202.69.69.180:443/webcast/bshdlive-pc");
-        clarityList.add(model_4);
-        controller.setClarityList(clarityList);
+//        List<ClarityModel> clarityList = new ArrayList<>();
+//        ClarityModel model_1 = new ClarityModel("1080P", "rtmp://58.200.131.2:1935/livetv/hunantv");
+//        clarityList.add(model_1);
+//        ClarityModel model_2 = new ClarityModel("720P",
+//                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c?wsTime=1575525184&wsSecret=34e467150476d3dc71a451a402e756a2");
+//        clarityList.add(model_2);
+//        ClarityModel model_3 = new ClarityModel("480P",
+//                "rtmp://fms.105.net/live/rmc1");
+////                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c_480p?wsTime=1575525184&wsSecret=2a60f7cc92a584301a9fe3e84711d35b");
+//        clarityList.add(model_3);
+//        ClarityModel model_4 = new ClarityModel("360P", "rtmp://202.69.69.180:443/webcast/bshdlive-pc");
+//        clarityList.add(model_4);
+//        controller.setClarityList(clarityList);
         videoLayout.setPath(path);
         controller.setThumbVisibility(View.VISIBLE);
 
