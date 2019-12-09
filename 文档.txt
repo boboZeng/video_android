@@ -1,7 +1,0 @@
-1。基于https://github.com/Bilibili/ijkplayer
-
-2。修复支持https
-        参考：https://www.imooc.com/article/33930
-
-
-
