@@ -4,13 +4,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.TrafficStats;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Process;
+import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
+import com.facebook.network.connectionclass.ConnectionClassManager;
+import com.facebook.network.connectionclass.ConnectionQuality;
+import com.facebook.network.connectionclass.DeviceBandwidthSampler;
 import com.video.live.ClarityModel;
 import com.video.live.IjkPlayerStatus;
 import com.video.live.NetWorkBroadcastManager;
@@ -31,7 +41,10 @@ public class MainActivity extends AppCompatActivity {
     private SimpleVideoLayoutController controller;
     //    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/5759_push_5ddda0f46684e?wsTime=1575009617&wsSecret=d4323e657297dd55680d808bb29c0775";
     private String path = "rtmp://58.200.131.2:1935/livetv/hunantv";
+//    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/7017_push_5deef2d814081?wsTime=1575941413&wsSecret=02225de3fa5a11e62128c86db9c76b8e";
+
     private NetWorkBroadcastManager netWorkBroadcastManager;
+    private TextView tv_content;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        tv_content = findViewById(R.id.tv_content);
         videoLayout = findViewById(R.id.videoLayout);
         videoLayout.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
             @Override
@@ -97,19 +111,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        List<ClarityModel> clarityList = new ArrayList<>();
-//        ClarityModel model_1 = new ClarityModel("1080P", "rtmp://58.200.131.2:1935/livetv/hunantv");
-//        clarityList.add(model_1);
-//        ClarityModel model_2 = new ClarityModel("720P",
-//                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c?wsTime=1575525184&wsSecret=34e467150476d3dc71a451a402e756a2");
-//        clarityList.add(model_2);
-//        ClarityModel model_3 = new ClarityModel("480P",
-//                "rtmp://fms.105.net/live/rmc1");
-////                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c_480p?wsTime=1575525184&wsSecret=2a60f7cc92a584301a9fe3e84711d35b");
-//        clarityList.add(model_3);
-//        ClarityModel model_4 = new ClarityModel("360P", "rtmp://202.69.69.180:443/webcast/bshdlive-pc");
-//        clarityList.add(model_4);
-//        controller.setClarityList(clarityList);
+        List<ClarityModel> clarityList = new ArrayList<>();
+        ClarityModel model_1 = new ClarityModel("1080P", "rtmp://58.200.131.2:1935/livetv/hunantv");
+        clarityList.add(model_1);
+        ClarityModel model_2 = new ClarityModel("720P",
+                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c?wsTime=1575525184&wsSecret=34e467150476d3dc71a451a402e756a2");
+        clarityList.add(model_2);
+        ClarityModel model_3 = new ClarityModel("480P",
+                "rtmp://fms.105.net/live/rmc1");
+//                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c_480p?wsTime=1575525184&wsSecret=2a60f7cc92a584301a9fe3e84711d35b");
+        clarityList.add(model_3);
+        ClarityModel model_4 = new ClarityModel("360P", "rtmp://202.69.69.180:443/webcast/bshdlive-pc");
+        clarityList.add(model_4);
+        controller.setClarityList(clarityList);
         videoLayout.setPath(path);
         controller.setThumbVisibility(View.VISIBLE);
 
@@ -139,11 +153,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         netWorkBroadcastManager.registerReceiver(this);
+        mHandler.sendEmptyMessageDelayed(1, 1000);
+
+        DeviceBandwidthSampler.getInstance().startSampling();
+
+        currentTime = System.currentTimeMillis();
+        currentBytes = TrafficStats.getUidRxBytes(Process.myUid());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        ConnectionClassManager.getInstance().register(listener);
         if (videoLayout != null) {
             if (videoLayout.getCurrentState() == VideoLayout.STATE_AUTO_PAUSED
                     || videoLayout.getCurrentState() == VideoLayout.STATE_ERROR) {
@@ -155,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
+        ConnectionClassManager.getInstance().remove(listener);
         if (videoLayout != null) {
             videoLayout.pause(true);
         }
@@ -164,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         netWorkBroadcastManager.unregisterReceiver(this);
+        mHandler.removeMessages(1);
     }
 
     @Override
@@ -179,5 +202,39 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    private ConnectionClassManager.ConnectionClassStateChangeListener listener
+            = bandwidthState -> {
+        System.out.println("Connection MainActivity bandwidthState:" + bandwidthState.toString());
+        Log.e("onBandwidthStateChange", bandwidthState.toString());
+    };
 
+    private long currentTime = -1;
+    private long currentBytes = -1;
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+                long time = System.currentTimeMillis();
+                long bytes = TrafficStats.getUidRxBytes(Process.myUid());
+
+                double  s = (bytes-currentBytes)/(time-currentTime);
+                currentBytes =bytes;
+                currentTime =time;
+
+                ConnectionQuality connectionQuality = ConnectionClassManager.getInstance().getCurrentBandwidthQuality();
+                String name = connectionQuality.name();
+                System.out.println("Connection MainActivity handleMessage connectionQuality:" + name
+                        + ",getDownloadKBitsPerSecond:" + ConnectionClassManager.getInstance().getDownloadKBitsPerSecond());
+                if (name.equals("POOR")) {
+                }
+                tv_content.setText((int) (ConnectionClassManager.getInstance().getDownloadKBitsPerSecond() / 8) + "k/s " + name
+                +"\n "+s
+                +"\n "+VideoUtils.getMoblieNetWorkType(getApplicationContext()));
+                mHandler.sendEmptyMessageDelayed(1, 1000);
+            }
+
+        }
+    };
 }

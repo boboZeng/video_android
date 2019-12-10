@@ -1,7 +1,2 @@
 apply plugin: 'com.android.library'
 apply from: rootDir.getPath() + '/gradle/common.gradle'
-
-
-dependencies {
-    implementation(name: 'swiperefreshlayout-1.1.0-alpha03', ext: 'aar')
-}

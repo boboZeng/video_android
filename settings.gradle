@@ -1,1 +1,1 @@
-include ':app', ':video_live', ':video_airplay'
+include ':app', ':video_live', ':video_airplay', ':video_network'
