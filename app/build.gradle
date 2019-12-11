@@ -51,14 +51,10 @@ android {
 
 dependencies {
     implementation project(":video_live")
+    implementation project(":video_network")
     implementation project(":video_airplay")
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation('com.android.support:multidex:1.0.1')
 
     implementation(name: 'swiperefreshlayout-1.1.0-alpha03', ext: 'aar')
-
-
-    implementation 'com.facebook.network.connectionclass:connectionclass:1.0.1'
-
-
 }

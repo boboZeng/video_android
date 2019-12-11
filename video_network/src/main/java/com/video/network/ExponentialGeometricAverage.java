@@ -33,17 +33,17 @@ class ExponentialGeometricAverage {
    * @param measurement - Bandwidth measurement in bits/ms to add to the moving average.
    */
   public void addMeasurement(double measurement) {
-    double keepConstant = 1 - mDecayConstant;
-    if (mCount > mCutover) {
-      mValue = Math.exp(keepConstant * Math.log(mValue) + mDecayConstant * Math.log(measurement));
-    } else if (mCount > 0) {
-      double retained = keepConstant * mCount / (mCount + 1.0);
-      double newcomer = 1.0 - retained;
-      mValue = Math.exp(retained * Math.log(mValue) + newcomer * Math.log(measurement));
-    } else {
+//    double keepConstant = 1 - mDecayConstant;
+//    if (mCount > mCutover) {
+//      mValue = Math.exp(keepConstant * Math.log(mValue) + mDecayConstant * Math.log(measurement));
+//    } else if (mCount > 0) {
+//      double retained = keepConstant * mCount / (mCount + 1.0);
+//      double newcomer = 1.0 - retained;
+//      mValue = Math.exp(retained * Math.log(mValue) + newcomer * Math.log(measurement));
+//    } else {
       mValue = measurement;
-    }
-    mCount++;
+//    }
+//    mCount++;
   }
 
   public double getAverage() {

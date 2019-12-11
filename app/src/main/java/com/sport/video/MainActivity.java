@@ -18,9 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
-import com.facebook.network.connectionclass.ConnectionClassManager;
-import com.facebook.network.connectionclass.ConnectionQuality;
-import com.facebook.network.connectionclass.DeviceBandwidthSampler;
 import com.video.live.ClarityModel;
 import com.video.live.IjkPlayerStatus;
 import com.video.live.NetWorkBroadcastManager;
@@ -30,6 +27,9 @@ import com.video.live.SimpleVideoLayoutController;
 import com.video.live.VideoConstants;
 import com.video.live.VideoLayout;
 import com.video.live.VideoUtils;
+import com.video.network.ConnectionClassManager;
+import com.video.network.ConnectionQuality;
+import com.video.network.DeviceBandwidthSampler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +54,7 @@ public class MainActivity extends AppCompatActivity {
         netWorkBroadcastManager = new NetWorkBroadcastManager(new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isConnected) {
-                if (VideoUtils.isNetworkConnected(MainActivity.this)
-                        && VideoUtils.isMobileConnected(MainActivity.this)) {
-                    Toast.makeText(MainActivity.this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
-                }
+                playerNetWortNotice();
                 if (videoLayout == null || !isConnected || isFinishing()) {
                     return;
                 }
@@ -90,7 +87,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCustomInfo(int what) {
                 if (what == VideoConstants.VideoCustomStatus.BUFFERING_TIMEOUT) {
-                    Toast.makeText(MainActivity.this, "网络不稳定，切换低清晰度播放更流畅", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "您当前下载速度"
+                                    + (int) ConnectionClassManager.getInstance().getDownloadKBytePerSecond()
+                                    + "K/S,  请切换网络立享高清直播",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -147,18 +147,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (VideoUtils.isNetworkConnected(this)
-                && !VideoUtils.isWifiConnected(this)) {
-            Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
-        }
+        playerNetWortNotice();
 
         netWorkBroadcastManager.registerReceiver(this);
         mHandler.sendEmptyMessageDelayed(1, 1000);
 
+        DeviceBandwidthSampler.init(Process.myUid());
         DeviceBandwidthSampler.getInstance().startSampling();
 
         currentTime = System.currentTimeMillis();
         currentBytes = TrafficStats.getUidRxBytes(Process.myUid());
+    }
+
+    private void playerNetWortNotice() {
+        if (VideoUtils.isNetworkConnected(this)
+                && !VideoUtils.isWifiConnected(this)) {
+            int type = VideoUtils.getMoblieNetWorkType(this);
+            if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_2_G) {
+                Toast.makeText(this, "您当前处于2G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
+            } else if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_3_G) {
+                Toast.makeText(this, "您当前处于3G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
+            } else if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_4_G) {
+                Toast.makeText(this, "您当前处于4G网络，请注意流量消耗", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -216,22 +230,20 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == 1) {
-                long time = System.currentTimeMillis();
                 long bytes = TrafficStats.getUidRxBytes(Process.myUid());
+                long time = System.currentTimeMillis();
 
-                double  s = (bytes-currentBytes)/(time-currentTime);
-                currentBytes =bytes;
-                currentTime =time;
+                double s = (bytes - currentBytes) / (time - currentTime);
+                currentBytes = bytes;
+                currentTime = time;
 
                 ConnectionQuality connectionQuality = ConnectionClassManager.getInstance().getCurrentBandwidthQuality();
                 String name = connectionQuality.name();
-                System.out.println("Connection MainActivity handleMessage connectionQuality:" + name
-                        + ",getDownloadKBitsPerSecond:" + ConnectionClassManager.getInstance().getDownloadKBitsPerSecond());
                 if (name.equals("POOR")) {
                 }
-                tv_content.setText((int) (ConnectionClassManager.getInstance().getDownloadKBitsPerSecond() / 8) + "k/s " + name
-                +"\n "+s
-                +"\n "+VideoUtils.getMoblieNetWorkType(getApplicationContext()));
+                tv_content.setText((int) ConnectionClassManager.getInstance().getDownloadKBytePerSecond() + "k/s " + name
+                        + "\n " + s + "k/s"
+                        + "\n 网络类型：" + VideoUtils.getMoblieNetWorkType(getApplicationContext()));
                 mHandler.sendEmptyMessageDelayed(1, 1000);
             }
 
