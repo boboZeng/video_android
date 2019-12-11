@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.LinkProperties;
 import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.os.Build;
@@ -68,18 +70,42 @@ public class NetWorkBroadcastManager {
                 @Override
                 public void onAvailable(Network network) {
                     super.onAvailable(network);
-                    if (observer != null) {
-                        observer.onChanged(true);
-                    }
-
+                    VideoUtils.d("ConnectivityManager.NetworkCallback onAvailable");
                 }
+
 
                 @Override
                 public void onLost(Network network) {
                     super.onLost(network);
+                    VideoUtils.d("ConnectivityManager.NetworkCallback onLost");
+                }
+
+                @Override
+                public void onLosing(Network network, int maxMsToLive) {
+                    super.onLosing(network, maxMsToLive);
+                    VideoUtils.d("ConnectivityManager.NetworkCallback onLosing");
+
+                }
+
+                @Override
+                public void onUnavailable() {
+                    super.onUnavailable();
+                    VideoUtils.d("ConnectivityManager.NetworkCallback onUnavailable");
+                }
+
+                @Override
+                public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
+                    super.onCapabilitiesChanged(network, networkCapabilities);
+                    VideoUtils.d("ConnectivityManager.NetworkCallback onCapabilitiesChanged");
                     if (observer != null) {
-                        observer.onChanged(true);
+                        observer.onChanged(false);
                     }
+                }
+
+                @Override
+                public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
+                    super.onLinkPropertiesChanged(network, linkProperties);
+                    VideoUtils.d("ConnectivityManager.NetworkCallback onLinkPropertiesChanged");
                 }
             };
         }

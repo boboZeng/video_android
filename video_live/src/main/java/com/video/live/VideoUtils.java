@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -61,7 +62,6 @@ public class VideoUtils {
             return mFormatter.format("%02d:%02d", minutes, seconds).toString();
         }
     }
-
 
 
     /**
@@ -287,6 +287,7 @@ public class VideoUtils {
         if (context != null) {
             ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo mMobileNetworkInfo = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
             if (mMobileNetworkInfo != null) {
                 return mMobileNetworkInfo.isConnected();
             }
@@ -311,4 +312,54 @@ public class VideoUtils {
         return -1;
     }
 
+    /**
+     * 获取手机网络类型；
+     * @param context
+     * @return
+     */
+    public static int getMoblieNetWorkType(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mMobileNetworkInfo = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+            if (mMobileNetworkInfo != null && mMobileNetworkInfo.isConnected()) {
+                return getNetworkClass(mMobileNetworkInfo.getSubtype());
+            }
+        }
+        return VideoConstants.NETWORK_CLASS.NETWORK_CLASS_UNKNOWN;
+    }
+
+    /**
+     *
+     * 获取手机网络类型；2G/3G/4G
+     * @param networkType
+     * @return
+     */
+    public static int getNetworkClass(int networkType) {
+        switch (networkType) {
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_GPRS:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_GSM:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_EDGE:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_CDMA:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_1xRTT:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_IDEN:
+                return VideoConstants.NETWORK_CLASS.NETWORK_CLASS_2_G;
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_UMTS:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_EVDO_0:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_EVDO_A:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_HSDPA:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_HSUPA:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_HSPA:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_EVDO_B:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_EHRPD:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_HSPAP:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_TD_SCDMA:
+                return VideoConstants.NETWORK_CLASS.NETWORK_CLASS_3_G;
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_LTE:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_IWLAN:
+            case VideoConstants.NETWORK_TYPE.NETWORK_TYPE_LTE_CA:
+                return VideoConstants.NETWORK_CLASS.NETWORK_CLASS_4_G;
+            default:
+                return VideoConstants.NETWORK_CLASS.NETWORK_CLASS_UNKNOWN;
+        }
+    }
 }
