@@ -1,3 +1,8 @@
+## 工程下的库描述
+### 1. video_live 播放器
+### 2. video_network 网速采样
+
+
 ## *说明*：
 1.基于https://github.com/Bilibili/ijkplayer
 
@@ -5,15 +10,25 @@
         参考：https://www.imooc.com/article/33930
 
 ## *使用文档*
+###
 
-### 一、提示用户4G还是Wifi
+### 一、提示用户2G/3G/4G还是Wifi
 
 > 需求：进入直播页面如果是非Wifi提示用户网络情况；
 ```
-if (VideoUtils.isNetworkConnected(this)
-       && !VideoUtils.isWifiConnected(this)) {
-     Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
-}
+        if (VideoUtils.isNetworkConnected(this)
+                && !VideoUtils.isWifiConnected(this)) {
+            int type = VideoUtils.getMoblieNetWorkType(this);
+            if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_2_G) {
+                Toast.makeText(this, "您当前处于2G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
+            } else if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_3_G) {
+                Toast.makeText(this, "您当前处于3G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
+            } else if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_4_G) {
+                Toast.makeText(this, "您当前处于4G网络，请注意流量消耗", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
+            }
+        }
 ```
 
 ### 二、自动续播
@@ -64,10 +79,19 @@ if (VideoUtils.isNetworkConnected(this)
     private Observer netWorkBroadcastManagerObserver =  new Observer<Boolean>() {
           @Override
           public void onChanged(Boolean aBoolean) {
-                if (VideoUtils.isNetworkConnected(MainActivity.this)
-                      && VideoUtils.isMobileConnected(MainActivity.this)) {
-                       Toast.makeText(MainActivity.this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
-               }
+                if (VideoUtils.isNetworkConnected(this)
+                && !VideoUtils.isWifiConnected(this)) {
+                    int type = VideoUtils.getMoblieNetWorkType(this);
+                    if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_2_G) {
+                        Toast.makeText(this, "您当前处于2G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
+                    } else if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_3_G) {
+                        Toast.makeText(this, "您当前处于3G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
+                    } else if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_4_G) {
+                        Toast.makeText(this, "您当前处于4G网络，请注意流量消耗", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
+                    }
+                }
                if (videoLayout == null || !isConnected || isFinishing()) {
                      return;
                }
@@ -89,7 +113,9 @@ if (VideoUtils.isNetworkConnected(this)
             @Override
             public void onCustomInfo(int what) {
                 if (what == VideoConstants.VideoCustomStatus.BUFFERING_TIMEOUT) {
-                    Toast.makeText(MainActivity.this, "网络不稳定，切换低清晰度播放更流畅", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "您当前下载速度"
+                        + (int) ConnectionClassManager.getInstance().getDownloadKBytePerSecond()
+                        + "K/S,  请切换网络立享高清直播",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -118,6 +144,24 @@ videoLayout.load()
         controller.setClarityList(clarityList);
 ```
 
+### 六、当前网络速度采集
+```
+        //Process.myUid()当前进程uid，默认uid=-1,采集手机所有app消耗的流量
+        DeviceBandwidthSampler.init(Process.myUid());
+        //开始采集
+        DeviceBandwidthSampler.getInstance().startSampling();
+        
+        
+        //停止采集
+        DeviceBandwidthSampler.getInstance().stopSampling();
+        
+        //当前网速 单位 k/s
+        ConnectionClassManager.getInstance().getDownloadKBytePerSecond()
+        
+        //当前码率 单位 kbps
+        ConnectionClassManager.getInstance().getDownloadKBitsPerSecond()
+        
+```
 
 
 
