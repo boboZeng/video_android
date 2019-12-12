@@ -98,7 +98,7 @@ public class NetWorkBroadcastManager {
                     super.onCapabilitiesChanged(network, networkCapabilities);
                     VideoUtils.d("ConnectivityManager.NetworkCallback onCapabilitiesChanged");
                     if (observer != null) {
-                        observer.onChanged(false);
+                        observer.onChanged(true);
                     }
                 }
 

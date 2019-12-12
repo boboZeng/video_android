@@ -17,7 +17,7 @@
 > 需求：进入直播页面如果是非Wifi提示用户网络情况；
 ```
         if (VideoUtils.isNetworkConnected(this)
-                && !VideoUtils.isWifiConnected(this)) {
+                && VideoUtils.isMobileConnected(this)) {
             int type = VideoUtils.getMoblieNetWorkType(this);
             if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_2_G) {
                 Toast.makeText(this, "您当前处于2G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
@@ -80,7 +80,7 @@
           @Override
           public void onChanged(Boolean aBoolean) {
                 if (VideoUtils.isNetworkConnected(this)
-                && !VideoUtils.isWifiConnected(this)) {
+                && VideoUtils.isMobileConnected(this)) {
                     int type = VideoUtils.getMoblieNetWorkType(this);
                     if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_2_G) {
                         Toast.makeText(this, "您当前处于2G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
@@ -92,7 +92,7 @@
                         Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
                     }
                 }
-               if (videoLayout == null || !isConnected || isFinishing()) {
+               if (videoLayout == null) {
                      return;
                }
                if (videoLayout.getCurrentState() == VideoLayout.STATE_AUTO_PAUSED

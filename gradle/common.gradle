@@ -25,6 +25,10 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'META-INF/beans.xml'
+
+    }
 }
 
 repositories {

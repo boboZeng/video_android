@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     private NetWorkBroadcastManager netWorkBroadcastManager;
     private TextView tv_content;
-
+    private boolean isShowNotice = true;//
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(Boolean isConnected) {
                 playerNetWortNotice();
-                if (videoLayout == null || !isConnected || isFinishing()) {
+                if (videoLayout == null) {
                     return;
                 }
                 if (videoLayout.getCurrentState() == VideoLayout.STATE_AUTO_PAUSED
@@ -87,10 +87,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCustomInfo(int what) {
                 if (what == VideoConstants.VideoCustomStatus.BUFFERING_TIMEOUT) {
-                    Toast.makeText(MainActivity.this, "您当前下载速度"
-                                    + (int) ConnectionClassManager.getInstance().getDownloadKBytePerSecond()
-                                    + "K/S,  请切换网络立享高清直播",
-                            Toast.LENGTH_SHORT).show();
+                    if(isShowNotice){
+                        isShowNotice = false;
+                        Toast.makeText(MainActivity.this, "您当前下载速度"
+                                        + (int) ConnectionClassManager.getInstance().getDownloadKBytePerSecond()
+                                        + "K/S,  请切换网络立享高清直播",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -111,19 +114,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        List<ClarityModel> clarityList = new ArrayList<>();
-        ClarityModel model_1 = new ClarityModel("1080P", "rtmp://58.200.131.2:1935/livetv/hunantv");
-        clarityList.add(model_1);
-        ClarityModel model_2 = new ClarityModel("720P",
-                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c?wsTime=1575525184&wsSecret=34e467150476d3dc71a451a402e756a2");
-        clarityList.add(model_2);
-        ClarityModel model_3 = new ClarityModel("480P",
-                "rtmp://fms.105.net/live/rmc1");
-//                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c_480p?wsTime=1575525184&wsSecret=2a60f7cc92a584301a9fe3e84711d35b");
-        clarityList.add(model_3);
-        ClarityModel model_4 = new ClarityModel("360P", "rtmp://202.69.69.180:443/webcast/bshdlive-pc");
-        clarityList.add(model_4);
-        controller.setClarityList(clarityList);
+//        List<ClarityModel> clarityList = new ArrayList<>();
+//        ClarityModel model_1 = new ClarityModel("1080P", "rtmp://58.200.131.2:1935/livetv/hunantv");
+//        clarityList.add(model_1);
+//        ClarityModel model_2 = new ClarityModel("720P",
+//                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c?wsTime=1575525184&wsSecret=34e467150476d3dc71a451a402e756a2");
+//        clarityList.add(model_2);
+//        ClarityModel model_3 = new ClarityModel("480P",
+//                "rtmp://fms.105.net/live/rmc1");
+////                "rtmp://wslive.undemonstrable.cn/wslive1/328_push_5dcbd506de59c_480p?wsTime=1575525184&wsSecret=2a60f7cc92a584301a9fe3e84711d35b");
+//        clarityList.add(model_3);
+//        ClarityModel model_4 = new ClarityModel("360P", "rtmp://202.69.69.180:443/webcast/bshdlive-pc");
+//        clarityList.add(model_4);
+//        controller.setClarityList(clarityList);
         videoLayout.setPath(path);
         controller.setThumbVisibility(View.VISIBLE);
 
@@ -161,16 +164,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void playerNetWortNotice() {
         if (VideoUtils.isNetworkConnected(this)
-                && !VideoUtils.isWifiConnected(this)) {
+                && VideoUtils.isMobileConnected(this)) {
             int type = VideoUtils.getMoblieNetWorkType(this);
             if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_2_G) {
                 Toast.makeText(this, "您当前处于2G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
+                isShowNotice = true;
             } else if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_3_G) {
                 Toast.makeText(this, "您当前处于3G网络，请切换网络立享高清直播", Toast.LENGTH_SHORT).show();
+                isShowNotice = true;
             } else if (type == VideoConstants.NETWORK_CLASS.NETWORK_CLASS_4_G) {
                 Toast.makeText(this, "您当前处于4G网络，请注意流量消耗", Toast.LENGTH_SHORT).show();
+                isShowNotice = true;
             } else {
                 Toast.makeText(this, "当前为非wifi环境，请注意流量消耗", Toast.LENGTH_SHORT).show();
+                isShowNotice = true;
             }
         }
     }

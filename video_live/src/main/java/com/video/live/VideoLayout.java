@@ -793,11 +793,11 @@ public class VideoLayout extends FrameLayout implements VideoController {
             VideoUtils.d("VideoLayout handleMessage start");
             if (msg.what == VideoConstants.VideoWhat.WHAT_BUFFERING) {
                 VideoUtils.d("VideoLayout handleMessage what:" + VideoConstants.VideoWhat.WHAT_BUFFERING);
-                if (bufferingStartTime == -1 || !videoLayoutController.isSupportChangeClarity()) {
+                if (bufferingStartTime == -1 ) {//|| !videoLayoutController.isSupportChangeClarity()
                     return;
                 }
                 if (onCustomInfoListener != null
-                        && System.currentTimeMillis() - bufferingStartTime > 10000) {
+                        && System.currentTimeMillis() - bufferingStartTime > 3000) {
                     onCustomInfoListener.onCustomInfo(VideoConstants.VideoCustomStatus.BUFFERING_TIMEOUT);
                     return;
                 }
