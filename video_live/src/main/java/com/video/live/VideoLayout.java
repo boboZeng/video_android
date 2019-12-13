@@ -797,7 +797,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
                     return;
                 }
                 if (onCustomInfoListener != null
-                        && System.currentTimeMillis() - bufferingStartTime > 3000) {
+                        && System.currentTimeMillis() - bufferingStartTime > 10000) {
                     onCustomInfoListener.onCustomInfo(VideoConstants.VideoCustomStatus.BUFFERING_TIMEOUT);
                     return;
                 }
