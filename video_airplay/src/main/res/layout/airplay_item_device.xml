@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp">
+
+    <TextView
+        android:id="@+id/listview_item_line_one"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="18dp"
+        android:drawableLeft="@drawable/airplay_sel_icon_device"
+        android:drawablePadding="5dp"
+        android:paddingLeft="20dp"
+        android:background="@drawable/airplay_sel_bg_device"
+        android:paddingRight="20dp"
+        android:text="S50Air8c2a(lebo)"
+        android:textColor="#FFFFFFFF"
+        android:gravity="center"
+        android:textSize="15sp" />
+
+</FrameLayout>

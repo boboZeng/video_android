@@ -22,10 +22,13 @@
         android:scaleType="fitCenter"
         android:visibility="invisible" />
 
+
+
     <RelativeLayout
         android:id="@+id/layout_bottom"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:background="@drawable/video_bg_bottom"
         android:gravity="center_vertical"
@@ -33,19 +36,36 @@
         android:visibility="invisible">
 
         <ImageView
-            android:id="@+id/start"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:id="@+id/img_muteAudio"
+            android:layout_width="36dp"
+            android:layout_height="40dp"
             android:layout_alignParentLeft="true"
-            android:src="@drawable/video_sel_play" />
+            android:scaleType="center"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="5dp"
+            android:src="@drawable/video_ic_audio_open" />
+
+        <ImageView
+            android:id="@+id/start"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toRightOf="@id/img_muteAudio"
+            android:scaleType="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="6dp"
+            android:src="@drawable/video_ic_play" />
 
         <ImageView
             android:id="@+id/fullscreen"
-            android:layout_width="45dp"
-            android:layout_height="fill_parent"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_alignParentRight="true"
-            android:scaleType="centerInside"
-            android:src="@drawable/video_enlarge" />
+            android:scaleType="center"
+            android:src="@drawable/video_ic_fullscreen" />
 
 
         <TextView
@@ -56,9 +76,9 @@
             android:layout_marginRight="10dp"
             android:layout_toLeftOf="@id/fullscreen"
             android:text="@string/clarity"
-            android:visibility="gone"
             android:textColor="#ffffff"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <View
@@ -73,11 +93,22 @@
     <RelativeLayout
         android:id="@+id/layout_top"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/statusBar"
         android:paddingStart="10dp"
         android:paddingLeft="10dp"
         android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/img_airPlay"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:scaleType="center"
+            android:src="@drawable/video_ic_airplay" />
 
         <ImageView
             android:id="@+id/back"
@@ -198,11 +229,8 @@
         android:layout_height="40dp"
         android:layout_centerVertical="true"
         android:layout_marginLeft="20dp"
-        android:paddingLeft="11dp"
-        android:paddingTop="10dp"
-        android:paddingRight="12dp"
-        android:paddingBottom="11dp"
-        android:src="@drawable/video_icon_unlock"
+        android:scaleType="center"
+        android:src="@drawable/video_ic_unlock"
         android:visibility="gone" />
 
 

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.AirPlayActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/img_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:padding="15dp"
+            android:scaleType="center"
+            android:src="@drawable/airplay_icon_refresh" />
+
+        <ImageView
+            android:id="@+id/img_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:padding="15dp"
+            android:scaleType="center"
+            android:src="@drawable/airplay_icon_close" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:drawableLeft="@drawable/airplay_icon_dot"
+        android:drawablePadding="5dp"
+        android:text="正在搜索可投屏设备"
+        android:textColor="#FFFFFFFF"
+        android:textSize="14dp" />
+
+    <TextView
+        android:id="@+id/tv_wifi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:text="当前Wi-Fi：cubee"
+        android:textColor="#FF9C9D9F"
+        android:textSize="12dp" />
+
+
+    <ListView
+        android:id="@+id/lv_devices"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="63dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:dlna="urn:schemas-dlna-org:metadata-1-0/"
+    xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+    xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">
+    <item id="id" parentID="0" restricted="0">
+        <dc:title>name</dc:title>
+        <upnp:artist>unknow</upnp:artist>
+        <upnp:class>object.item.videoItem</upnp:class>
+        <dc:date>2019-12-17T14:44:23</dc:date>
+        <res protocolInfo="http-get:*:*/*:*">
+            rtmp://wslive.undemonstrable.cn/wslive1/7237_push_5df20b1471689?wsTime=1576478561&
+            wsSecret=98907120c911e2833287266029a65741
+        </res>
+    </item>
+</DIDL-Lite>
+
+    <?xml version="1.0"?><DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:dlna="urn:schemas-dlna-org:metadata-1-0/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">
+<item id="id" parentID="0" restricted="0">
+    <dc:title>name</dc:title>
+    <upnp:artist>unknow</upnp:artist>
+    <upnp:class>object.item.videoItem</upnp:class>
+    <dc:date>2019-12-17T15:02:57</dc:date>
+    <res protocolInfo="http-get:*:*/*:*">
+        rtmp://wslive.undemonstrable.cn/wslive1/7237_push_5df20b1471689?wsTime=1576478561&
+        wsSecret=98907120c911e2833287266029a65741
+    </res>
+</item>
+</DIDL-Lite>
+
+    <?xml version="1.0"?><DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:dlna="urn:schemas-dlna-org:metadata-1-0/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">
+<item id="id" parentID="0" restricted="0">
+    <dc:title>name</dc:title>
+    <upnp:artist>unknow</upnp:artist>
+    <upnp:class>object.item.videoItem</upnp:class>
+    <dc:date>2019-12-17T15:04:23</dc:date>
+    <res protocolInfo="http-get:*:*/*:*">
+        rtmp://wslive.undemonstrable.cn/wslive1/7237_push_5df20b1471689?wsTime=1576478561&
+        wsSecret=98907120c911e2833287266029a65741
+    </res>
+</item>
+</DIDL-Lite>
+

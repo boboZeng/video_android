@@ -1,24 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sport.video.airplay">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application>
         <activity
-            android:name="com.androidupnpdemo.ui.MainActivity"
-            android:screenOrientation="portrait">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
-
+            android:name=".ui.AirPlayActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/airPlayTheme" />
 
         <service
-            android:name="com.androidupnpdemo.service.ClingUpnpService"
+            android:name=".service.ClingUpnpService"
             android:exported="false" />
 
         <service
-            android:name="com.androidupnpdemo.service.SystemService"
+            android:name=".service.SystemService"
             android:exported="false" />
     </application>
 </manifest>

@@ -50,4 +50,5 @@
         android:text="airplay"
         android:textColor="@color/colorPrimary"
         android:textSize="16dp" />
+
 </LinearLayout>

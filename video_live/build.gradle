@@ -1,2 +1,7 @@
 apply plugin: 'com.android.library'
 apply from: rootDir.getPath() + '/gradle/common.gradle'
+
+
+dependencies {
+    implementation project(":video_airplay")
+}

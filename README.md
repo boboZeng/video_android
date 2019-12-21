@@ -4,11 +4,16 @@
 
 
 ## *说明*：
-1.基于https://github.com/Bilibili/ijkplayer
+1.视频直播基于
+    https://github.com/Bilibili/ijkplayer
 
 2.修复支持https
-        参考：https://www.imooc.com/article/33930
+    参考：https://www.imooc.com/article/33930
 
+3.投屏基于
+    https://github.com/4thline/cling
+    https://github.com/zaneCC/AndroidUPnPDemo
+       
 ## *使用文档*
 ###
 
@@ -163,5 +168,7 @@ videoLayout.load()
         
 ```
 
+### 七、投屏界面
+        AirPlayActivity.start(MainActivity.this, path);
 
 

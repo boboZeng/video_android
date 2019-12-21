@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:dlna="urn:schemas-dlna-org:metadata-1-0/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+    xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">
+    <item id="id" parentID="0" restricted="0">
+        <dc:title>name</dc:title>
+        <upnp:artist>unknow</upnp:artist>
+        <upnp:class>object.item.videoItem</upnp:class>
+        <dc:date>2019-12-17T14:44:23</dc:date>
+        <res protocolInfo="http-get:*:*/*:*">
+            rtmp://wslive.undemonstrable.cn/wslive1/7237_push_5df20b1471689?wsTime=1576478561&
+            wsSecret=98907120c911e2833287266029a65741
+        </res>
+    </item>
+</DIDL-Lite>
+
+
+2019-12-17 15:02:57.653 18148-18148/com.sport.video I/System.out: com.sport.video.airplay  MainActivity play currentState:3
+2019-12-17 15:02:57.707 18148-18530/com.sport.video I/System.out: com.sport.video.airplay  ClingPlayControl setAVTransportURI url:
+
+
+rtmp://wslive.undemonstrable.cn/wslive1/7237_push_5df20b1471689?wsTime=1576478561&wsSecret=98907120c911e2833287266029a65741
+
+<?xml version="1.0"?><DIDL-Lite xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns:dlna="urn:schemas-dlna-org:metadata-1-0/"><item id="id" parentID="0" restricted="0"><dc:title>name</dc:title><upnp:artist>unknow</upnp:artist><upnp:class>object.item.videoItem</upnp:class><dc:date>2019-12-17T15:02:57</dc:date><res protocolInfo="http-get:*:*/*:*"  >rtmp://wslive.undemonstrable.cn/wslive1/7237_push_5df20b1471689?wsTime=1576478561&wsSecret=98907120c911e2833287266029a65741</res></item></DIDL-Lite>
+
+
+
+HTTP connection failed: (OutgoingActionRequestMessage) POST http://192.168.20.86:49154/_urn:schemas-upnp-org:service:AVTransport_control
+    java.net.ConnectException: Connection refused
+        at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)
+        at sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:760)
+        at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:116)
+        at org.eclipse.jetty.client.SelectConnector.startConnection(SelectConnector.java:79)
+        at org.eclipse.jetty.client.HttpDestination.startNewConnection(HttpDestination.java:275)
+        at org.eclipse.jetty.client.HttpDestination.doSend(HttpDestination.java:566)
+        at org.eclipse.jetty.client.HttpDestination.send(HttpDestination.java:504)
+        at org.eclipse.jetty.client.HttpClient.send(HttpClient.java:165)
+        at org.fourthline.cling.transport.impl.jetty.StreamClientImpl$2.call(StreamClientImpl.java:114)
+        at org.fourthline.cling.transport.impl.jetty.StreamClientImpl$2.call(StreamClientImpl.java:108)
+        at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1162)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:636)
+        at java.lang.Thread.run(Thread.java:764)
+2019-12-17 15:11:05.621 18148-19263/com.sport.video E/MainActivity: play fail
+2019-12-17 15:11:05.622 18148-18148/com.sport.video E/MainActivity: Execute ERROR_ACTION
+
+
+(RemoteDeviceIdentity) UDN: uuid:61b29b0d-1ed9-41b8-89bf-21c169a23392, Descriptor: http://192.168.20.218:58556/upnp/dev/61b29b0d-1ed9-41b8-89bf-21c169a23392/desc

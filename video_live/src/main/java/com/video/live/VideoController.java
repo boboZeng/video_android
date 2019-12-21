@@ -53,4 +53,10 @@ public interface VideoController {
      * @return
      */
     int getCurrentState();
+
+    /**
+     * 静音开关设置
+     * @param isMuteAudio
+     */
+     void setMuteAudio(boolean isMuteAudio) ;
 }

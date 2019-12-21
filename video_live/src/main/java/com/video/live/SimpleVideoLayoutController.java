@@ -1,15 +1,14 @@
 package com.video.live;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -19,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
+
+import com.sport.video.airplay.ui.AirPlayActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import java.util.List;
 public class SimpleVideoLayoutController extends VideoLayoutController implements View.OnClickListener {
     private VideoController videoController;
     protected ImageView startButton, imgThumb;
-    protected ImageView fullscreenButton, img_lock;
+    protected ImageView fullscreenButton, img_lock, img_airPlay, img_muteAudio;
     protected TextView tv_status, tv_clarity;
     protected TextView tv_message;
     protected View parentLayout, layout_top, layout_bottom, statusBar;
@@ -43,6 +44,7 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
     private OnBackListener onBackListener;
     private List<ClarityModel> clarityList = new ArrayList<>();//清晰度列表
     private int clarityPosition = -1;//选中播放清晰度
+    private boolean isMuteAudio = false;
 
     public SimpleVideoLayoutController(Context context, OnBackListener onBackListener) {
         super(context);
@@ -74,6 +76,11 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
         tv_clarity.setOnClickListener(this);
         img_lock = parentLayout.findViewById(R.id.img_lock);
         img_lock.setOnClickListener(this);
+        img_muteAudio = parentLayout.findViewById(R.id.img_muteAudio);
+        img_muteAudio.setOnClickListener(this);
+
+        img_airPlay = parentLayout.findViewById(R.id.img_airPlay);
+        img_airPlay.setOnClickListener(this);
 
         //首次不调用该方法，会引起状态栏异常
 //            clearFloatScreen();
@@ -153,7 +160,7 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
         if (id == R.id.img_lock) {
             boolean isSelect = img_lock.isSelected();
             img_lock.setSelected(!isSelect);
-            img_lock.setImageResource(isSelect ? R.drawable.video_icon_unlock : R.drawable.video_icon_lock);
+            img_lock.setImageResource(isSelect ? R.drawable.video_ic_unlock : R.drawable.video_ic_lock);
             showHideCover(true);
         } else if (id == R.id.start) {
             setMessage("");
@@ -200,6 +207,13 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
             }
             ll_clarity.setVisibility(View.VISIBLE);
             clarityAnimator(true);
+        } else if (id == R.id.img_airPlay) {
+            AirPlayActivity.start(v.getContext(), videoController.getVideoPath());
+        } else if (id == R.id.img_muteAudio) {
+            img_muteAudio.setImageResource(isMuteAudio ? R.drawable.video_ic_audio_open :
+                    R.drawable.video_ic_audio_close);
+            isMuteAudio = !isMuteAudio;
+            videoController.setMuteAudio(isMuteAudio);
         }
     }
 
@@ -275,7 +289,7 @@ public class SimpleVideoLayoutController extends VideoLayoutController implement
      */
     public void setTopVisibility(int visibility) {
         layout_top.setVisibility(visibility);
-        layout_bottom.invalidate();
+        layout_top.invalidate();
     }
 
     public void setBottomVisibility(int visibility) {

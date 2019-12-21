@@ -132,5 +132,6 @@
     <orderEntry type="library" name="Gradle: tv.danmaku.ijk.media:ijkplayer-arm64:0.8.8@aar" level="project" />
     <orderEntry type="library" name="Gradle: tv.danmaku.ijk.media:ijkplayer-x86:0.8.8@aar" level="project" />
     <orderEntry type="library" name="Gradle: tv.danmaku.ijk.media:ijkplayer-x86_64:0.8.8@aar" level="project" />
+    <orderEntry type="module" module-name="video_airplay" />
   </component>
 </module>

@@ -1,9 +1,5 @@
 package com.sport.video;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.net.TrafficStats;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
-import com.video.live.ClarityModel;
+import com.sport.video.airplay.ui.AirPlayActivity;
 import com.video.live.IjkPlayerStatus;
 import com.video.live.NetWorkBroadcastManager;
 import com.video.live.OnBackListener;
@@ -31,9 +27,6 @@ import com.video.network.ConnectionClassManager;
 import com.video.network.ConnectionQuality;
 import com.video.network.DeviceBandwidthSampler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,11 +34,13 @@ public class MainActivity extends AppCompatActivity {
     private SimpleVideoLayoutController controller;
     //    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/5759_push_5ddda0f46684e?wsTime=1575009617&wsSecret=d4323e657297dd55680d808bb29c0775";
     private String path = "rtmp://58.200.131.2:1935/livetv/hunantv";
+//    private String path = Config.TEST_URL; //"rtmp://wslive.undemonstrable.cn/wslive1/7237_push_5df20b1471689?wsTime=1576478561&wsSecret=98907120c911e2833287266029a65741";
 //    private String path = "rtmp://wslive.undemonstrable.cn/wslive1/7017_push_5deef2d814081?wsTime=1575941413&wsSecret=02225de3fa5a11e62128c86db9c76b8e";
 
     private NetWorkBroadcastManager netWorkBroadcastManager;
     private TextView tv_content;
     private boolean isShowNotice = true;//
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCustomInfo(int what) {
                 if (what == VideoConstants.VideoCustomStatus.BUFFERING_TIMEOUT) {
-                    if(isShowNotice){
+                    if (isShowNotice) {
                         isShowNotice = false;
                         Toast.makeText(MainActivity.this, "您当前下载速度"
                                         + (int) ConnectionClassManager.getInstance().getDownloadKBytePerSecond()
@@ -146,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv_airplay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, com.androidupnpdemo.ui.MainActivity.class));
+                AirPlayActivity.start(MainActivity.this, path);
             }
         });
 
@@ -225,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ConnectionClassManager.ConnectionClassStateChangeListener listener
             = bandwidthState -> {
-        System.out.println("Connection MainActivity bandwidthState:" + bandwidthState.toString());
+        System.out.println("Connection AirPlayActivity bandwidthState:" + bandwidthState.toString());
         Log.e("onBandwidthStateChange", bandwidthState.toString());
     };
 

@@ -374,7 +374,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
     public void start() {
         if (mMediaPlayer != null) {
             currentState = STATE_PLAYING;
-            videoLayoutController.setPlayImageResource(R.drawable.video_sel_pause);
+            videoLayoutController.setPlayImageResource(R.drawable.video_ic_pause);
             mMediaPlayer.start();
             mAudioFocusHelper.requestFocus();
         }
@@ -389,7 +389,8 @@ public class VideoLayout extends FrameLayout implements VideoController {
     public void pause(boolean isAutoPause) {
         if (mMediaPlayer != null) {
             currentState = isAutoPause ? STATE_AUTO_PAUSED : STATE_PAUSED;
-            videoLayoutController.setPlayImageResource(R.drawable.video_sel_play);
+            videoLayoutController.setPlayImageResource(R.drawable.video_ic_play);
+
             mMediaPlayer.pause();
             mAudioFocusHelper.abandonFocus();
         }
@@ -400,7 +401,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
     public void stop() {
         if (mMediaPlayer != null) {
             currentState = STATE_STOP;
-            videoLayoutController.setPlayImageResource(R.drawable.video_sel_play);
+            videoLayoutController.setPlayImageResource(R.drawable.video_ic_play);
             mMediaPlayer.stop();
             mAudioFocusHelper.abandonFocus();
             VideoUtils.cancelScreenOn((Activity) getContext());
@@ -428,7 +429,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
     public void reset() {
         if (mMediaPlayer != null) {
             currentState = STATE_IDLE;
-            videoLayoutController.setPlayImageResource(R.drawable.video_sel_play);
+            videoLayoutController.setPlayImageResource(R.drawable.video_ic_play);
             mMediaPlayer.reset();
             mAudioFocusHelper.abandonFocus();
         }
@@ -487,6 +488,13 @@ public class VideoLayout extends FrameLayout implements VideoController {
         return currentState;
     }
 
+    @Override
+    public void setMuteAudio(boolean isMuteAudio) {
+        if(mAudioFocusHelper!=null){
+            mAudioFocusHelper.setMuteAudio(isMuteAudio);
+        }
+    }
+
     //</editor-fold>
 
     //<editor-fold desc="音频监听 ">
@@ -495,9 +503,10 @@ public class VideoLayout extends FrameLayout implements VideoController {
      * 音频焦点改变监听
      */
     private class AudioFocusHelper implements AudioManager.OnAudioFocusChangeListener {
-        boolean startRequested = false;
-        boolean pausedForLoss = false;
-        int currentFocus = 0;
+        private boolean startRequested = false;
+        private boolean pausedForLoss = false;
+        private int currentFocus = 0;
+        private boolean isMuteAudio = false;
 
         @Override
         public void onAudioFocusChange(int focusChange) {
@@ -514,8 +523,9 @@ public class VideoLayout extends FrameLayout implements VideoController {
                         startRequested = false;
                         pausedForLoss = false;
                     }
-                    if (mMediaPlayer != null)//恢复音量
-                        mMediaPlayer.setVolume(1.0f, 1.0f);
+//                    if (mMediaPlayer != null)//恢复音量
+//                        mMediaPlayer.setVolume(1.0f, 1.0f);
+                    setMuteAudio(isMuteAudio);
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS://焦点丢失
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT://焦点暂时丢失
@@ -530,6 +540,13 @@ public class VideoLayout extends FrameLayout implements VideoController {
                     }
                     break;
             }
+        }
+
+        public void setMuteAudio(boolean isMuteAudio) {
+            this.isMuteAudio = isMuteAudio;
+            float volume = isMuteAudio ? 0f : 1f;
+            if (mMediaPlayer != null)//恢复音量
+                mMediaPlayer.setVolume(volume, volume);
         }
 
         boolean requestFocus() {
@@ -793,7 +810,7 @@ public class VideoLayout extends FrameLayout implements VideoController {
             VideoUtils.d("VideoLayout handleMessage start");
             if (msg.what == VideoConstants.VideoWhat.WHAT_BUFFERING) {
                 VideoUtils.d("VideoLayout handleMessage what:" + VideoConstants.VideoWhat.WHAT_BUFFERING);
-                if (bufferingStartTime == -1 ) {//|| !videoLayoutController.isSupportChangeClarity()
+                if (bufferingStartTime == -1) {//|| !videoLayoutController.isSupportChangeClarity()
                     return;
                 }
                 if (onCustomInfoListener != null
