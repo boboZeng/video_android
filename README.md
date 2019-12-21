@@ -1,6 +1,7 @@
 ## 工程下的库描述
 ### 1. video_live 播放器
 ### 2. video_network 网速采样
+### 3. video_airplay 投屏
 
 
 ## *说明*：
