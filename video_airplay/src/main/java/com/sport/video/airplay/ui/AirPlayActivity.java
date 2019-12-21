@@ -17,9 +17,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,8 +86,8 @@ public class AirPlayActivity extends AppCompatActivity implements
     private ListView mDeviceList;
     private ImageView img_refresh, img_close;
     private TextView tv_wifi;
-//    private SeekBar mSeekProgress;
-//    private SeekBar mSeekVolume;
+    //    private SeekBar mSeekProgress;
+    private SeekBar mSeekVolume;
 //    private Switch mSwitchMute;
 
     private BroadcastReceiver mTransportStateBroadcastReceiver;
@@ -127,6 +129,7 @@ public class AirPlayActivity extends AppCompatActivity implements
     };
 
     public static void start(Context context, String url) {
+        url = "https://nie.v.netease.com/r/video/20190810/39d108cb-3a65-4036-a574-48dff2a8764e.mp4";
         if (TextUtils.isEmpty(url)) {
             return;
         }
@@ -223,7 +226,7 @@ public class AirPlayActivity extends AppCompatActivity implements
 //        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_refresh);
 //        mTVSelected = (TextView) findViewById(R.id.tv_selected);
 //        mSeekProgress = (SeekBar) findViewById(R.id.seekbar_progress);
-//        mSeekVolume = (SeekBar) findViewById(R.id.seekbar_volume);
+        mSeekVolume = (SeekBar) findViewById(R.id.seekbar_volume);
 //        mSwitchMute = (Switch) findViewById(R.id.sw_mute);
 
         mDevicesAdapter = new DevicesAdapter(mContext);
@@ -234,7 +237,7 @@ public class AirPlayActivity extends AppCompatActivity implements
 //        mSeekProgress.setMax(15);
 
         // 最大音量就是 100，不要问我为什么
-//        mSeekVolume.setMax(100);
+        mSeekVolume.setMax(100);
     }
 
     private void initTextWifi() {
@@ -267,6 +270,7 @@ public class AirPlayActivity extends AppCompatActivity implements
             return false;
         }
         Utils.saveAirPlayDevice(AirPlayActivity.this, getDeviceName(device));
+        mClingPlayControl.setCurrentState(DLANPlayState.STOP);
         play();
         return true;
     }
@@ -315,10 +319,11 @@ public class AirPlayActivity extends AppCompatActivity implements
             }
         });
 
-//        // 静音开关
+        // 静音开关
 //        mSwitchMute.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 //            @Override
 //            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                Utils.d("AirPlayActivity mSwitchMute onCheckedChanged isChecked:"+isChecked);
 //                mClingPlayControl.setMute(isChecked, new ControlCallback() {
 //                    @Override
 //                    public void success(IResponse response) {
@@ -334,7 +339,7 @@ public class AirPlayActivity extends AppCompatActivity implements
 //        });
 //
 //        mSeekProgress.setOnSeekBarChangeListener(this);
-//        mSeekVolume.setOnSeekBarChangeListener(this);
+        mSeekVolume.setOnSeekBarChangeListener(this);
     }
 
     private String getDeviceName(Device device) {
@@ -559,21 +564,21 @@ public class AirPlayActivity extends AppCompatActivity implements
 //                    Log.e(TAG, "seek fail");
 //                }
 //            });
-//        } else if (id == R.id.seekbar_volume) {   // 音量
-//
-//            int currentVolume = seekBar.getProgress();
-//            mClingPlayControl.setVolume(currentVolume, new ControlCallback() {
-//                @Override
-//                public void success(IResponse response) {
-//                    Log.e(TAG, "volume success");
-//                }
-//
-//                @Override
-//                public void fail(IResponse response) {
-//                    Log.e(TAG, "volume fail");
-//                }
-//            });
-//        }
+//        } else
+        if (id == R.id.seekbar_volume) {   // 音量
+            int currentVolume = seekBar.getProgress();
+            mClingPlayControl.setVolume(currentVolume, new ControlCallback() {
+                @Override
+                public void success(IResponse response) {
+                    Log.e(TAG, "volume success");
+                }
+
+                @Override
+                public void fail(IResponse response) {
+                    Log.e(TAG, "volume fail");
+                }
+            });
+        }
     }
 
     /******************* end progress changed listener *************************/

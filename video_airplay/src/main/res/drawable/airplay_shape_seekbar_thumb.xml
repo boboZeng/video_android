@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#0BCD6E" />
+    <size
+        android:width="@dimen/airplay_seekBar_height"
+        android:height="@dimen/airplay_seekBar_height" />
+    <gradient
+        android:startColor="#0BCD6E"
+        android:endColor="#0BCD6E"
+        android:gradientRadius="@dimen/airplay_seekBar_height"
+        android:type="radial"/>
+</shape>

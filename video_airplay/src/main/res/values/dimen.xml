@@ -19,4 +19,8 @@
     <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
     <dimen name="text_size_large">18sp</dimen>
+
+    <dimen name="airplay_seekBar_height">12dp</dimen>
+    <dimen name="airplay_seekBar_radius">6dp</dimen>
+    <dimen name="airplay_seekBar_height_thumb">20dp</dimen>
 </resources>
