@@ -125,7 +125,7 @@ public class Utils {
     }
 
     public static void d(String str) {
-        System.out.println("com.sport.video.airplay  " + str);
+//        System.out.println("com.sport.video.airplay  " + str);
     }
 }
 
